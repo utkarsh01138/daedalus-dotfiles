@@ -47,6 +47,19 @@ Singleton {
     readonly property color glow: light ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(0.9, 0.11, 0.14, 0.5)
     readonly property color scrim: fade(bg, light ? 0.8 : 0.82)
 
+    // Wallpaper-specific profile detection (adaptive contrast for light sketch vs dark wallpapers):
+    readonly property bool isLightWall: {
+        const w = (Theme.wall || "").toLowerCase();
+        return w.includes("evan.png") || w.includes("white") || w.includes("light") || (!tones.length && st.light);
+    }
+
+    readonly property color hudText: isLightWall ? "#0A0A0E" : "#FFFFFF"
+    readonly property color hudSubText: isLightWall ? "#1F1F28" : "#EAEAEB"
+    readonly property color hudMute: isLightWall ? "#3E3E4D" : "#72727E"
+    readonly property color hudReticle: isLightWall ? "#C0000A" : Theme.accent
+    readonly property color hudGrid: isLightWall ? "#B8B8C0" : Theme.s3
+    readonly property color hudDim: isLightWall ? "#252530" : Theme.mute
+
     readonly property string dot: "FOT-Matisse Pro"        // Evangelion Matisse Pro title & number font
     readonly property string eva: "FOT-Matisse Pro"        // Evangelion Matisse font alias
     readonly property string ui: "Space Grotesk"
@@ -218,7 +231,8 @@ Singleton {
             property int briSteps: 20      // Hardware brightness key step divisions: 40/20/10 corresponds to 2.5%/5%/10% increments
             property bool quickHover: true // Reveal Quick Settings panel when hovering right screen edge
             property bool deckHover: true  // Reveal bottom Deck dashboard when hovering bottom screen edge
-            property var deck: ["clock", "weather", "perf", "net", "media"] // Ordered Deck sections (see decks)
+            property var deck: ["clock", "weather", "perf", "net", "media", "magi"] // Ordered Deck sections (see decks)
+            property bool larp: false      // Maximalist LARP / Tactical Overdrive mode
             property var bar: ["layout", "wifi", "bluetooth", "sound", "notes", "battery", "mode", "power"] // Status bar tray icons (see bars)
             property bool barTitle: true   // Window title display on status bar
             property string barAt: "top"   // Bar orientation: "top" for NERV Tactical Command Bar
@@ -237,7 +251,7 @@ Singleton {
     // Bento widget size mappings: widget ID -> cell span (3-column x 3-row grid of 220px cells). Overflow items excluded
     readonly property var kinds: ({ weather: 1, calendar: 1, cpu: 1, ram: 1, gpu: 1, disk: 1, battery: 1, buds: 1, player: 2, system: 3, cat: 1, cava: 1 })
     // Available Deck section IDs
-    readonly property var decks: ["clock", "weather", "perf", "net", "media"]
+    readonly property var decks: ["clock", "weather", "perf", "net", "media", "magi"]
     // Available Bar tray item IDs
     readonly property var bars: ["layout", "wifi", "bluetooth", "sound", "notes", "battery", "mode", "power", "cat"]
 

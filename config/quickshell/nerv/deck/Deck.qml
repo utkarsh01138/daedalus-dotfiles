@@ -151,7 +151,7 @@ Scope {
                                     height: root.h
                                     color: Theme.s3
                                 }
-                                Loader { sourceComponent: ({ clock: clockC, weather: weatherC, perf: perfC, net: netC, media: mediaC })[cell.modelData] }
+                                Loader { sourceComponent: ({ clock: clockC, weather: weatherC, perf: perfC, net: netC, media: mediaC, magi: magiC })[cell.modelData] }
                             }
                         }
                     }
@@ -376,6 +376,100 @@ Scope {
                     }
                     Item { width: 1; height: 8 }
                     Controls { anchors.horizontalCenter: parent.horizontalCenter; size: 20; play: 48 }
+                }
+            }
+
+            // MAGI Supercomputer Tri-Cluster & Eva Synchronicity Section
+            Component {
+                id: magiC
+                Column {
+                    width: 220
+                    Lb { width: parent.width; text: "magi · consensus 3/3"; px: 11; font.bold: true; color: Theme.hazard }
+                    Item { width: 1; height: 8 }
+
+                    // Tri-Cluster voting cards
+                    Column {
+                        width: parent.width
+                        spacing: 4
+                        Repeater {
+                            model: [
+                                { name: "MELCHIOR-1", role: "SCIENTIST", code: "CODE 474", vote: "AFFIRMATIVE" },
+                                { name: "BALTHASAR-2", role: "MOTHER", code: "CODE 474", vote: "AFFIRMATIVE" },
+                                { name: "CASPAR-3", role: "WOMAN", code: "CODE 474", vote: "AFFIRMATIVE" }
+                            ]
+                            Rectangle {
+                                required property var modelData
+                                width: parent.width
+                                height: 32
+                                radius: 0
+                                color: Theme.s2
+                                border { width: 1; color: Theme.line }
+
+                                Row {
+                                    anchors { left: parent.left; leftMargin: 8; right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
+                                    spacing: 6
+                                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: Theme.accent }
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Text {
+                                            text: parent.parent.parent.modelData.name
+                                            font { family: Theme.mono; pixelSize: 10; bold: true }
+                                            color: Theme.hazard
+                                        }
+                                        Text {
+                                            text: parent.parent.parent.modelData.role + " // " + parent.parent.parent.modelData.code
+                                            font { family: Theme.mono; pixelSize: 8 }
+                                            color: Theme.mute
+                                        }
+                                    }
+                                    Item { width: 1; height: 1 }
+                                    Text {
+                                        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+                                        text: "[ AGREE ]"
+                                        font { family: Theme.mono; pixelSize: 9; bold: true }
+                                        color: Theme.crimson
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Item { width: 1; height: 10 }
+
+                    // Eva Synch Ratio readout
+                    Rectangle {
+                        width: parent.width
+                        height: 56
+                        radius: 0
+                        color: Theme.s2
+                        border { width: 1; color: Theme.accent }
+
+                        Column {
+                            anchors { fill: parent; margins: 6 }
+                            spacing: 4
+                            Row {
+                                width: parent.width
+                                Text {
+                                    text: "EVA-01 SYNCH"
+                                    font { family: Theme.mono; pixelSize: 9; bold: true }
+                                    color: Theme.hazard
+                                }
+                                Text {
+                                    anchors.right: parent.right
+                                    text: "88.5%"
+                                    font { family: Theme.mono; pixelSize: 11; bold: true }
+                                    color: Theme.crimson
+                                }
+                            }
+                            // Segmented bar for synch
+                            Seg { width: parent.width; height: 6; n: 16; f: 0.885; on: Theme.crimson; off: Theme.s3 }
+                            Text {
+                                text: "HARMONIC DISTORTION: ±0.012% [STABLE]"
+                                font { family: Theme.mono; pixelSize: 8 }
+                                color: Theme.mute
+                            }
+                        }
+                    }
                 }
             }
         }

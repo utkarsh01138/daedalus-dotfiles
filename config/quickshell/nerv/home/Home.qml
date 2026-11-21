@@ -87,17 +87,17 @@ PanelWindow {
             font.family: Theme.mono
             font.pixelSize: 12
             font.bold: true
-            color: Theme.chalk
+            color: Theme.hudSubText
             font.letterSpacing: 1.2
         }
         Text {
             x: 104
             y: 260
             textFormat: Text.StyledText
-            text: `OPERATOR: <font color="${Theme.hazard}">${(Theme.state.name || Quickshell.env("USER")).toUpperCase()}</font><br><font color="${Theme.grey}">CLEARANCE: LEVEL-A // STATUS: NORMAL</font>`
+            text: `OPERATOR: <font color="${Theme.hazard}">${(Theme.state.name || Quickshell.env("USER")).toUpperCase()}</font><br><font color="${Theme.hudSubText}">CLEARANCE: LEVEL-A // STATUS: NORMAL</font>`
             font { family: Theme.mono; pixelSize: 14; bold: true; letterSpacing: 1 }
             lineHeight: 1.2
-            color: Theme.fg
+            color: Theme.hudText
         }
         Row {
             x: 104
@@ -395,8 +395,8 @@ PanelWindow {
         property string icon
         property string text
         spacing: 10
-        Icon { anchors.verticalCenter: parent.verticalCenter; text: parent.icon; font.pixelSize: 16 }
-        Lb { anchors.verticalCenter: parent.verticalCenter; text: parent.text }
+        Icon { anchors.verticalCenter: parent.verticalCenter; text: parent.icon; font.pixelSize: 16; color: Theme.hudReticle }
+        Lb { anchors.verticalCenter: parent.verticalCenter; text: parent.text; color: Theme.hudSubText }
     }
     component Stat: Column {
         property string label

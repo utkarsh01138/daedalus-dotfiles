@@ -29,6 +29,7 @@ PanelWindow {
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "nerv-bar"
+    WlrLayershell.exclusiveZone: 36
 
     property bool quickOpen: false
     property bool deckOpen: Sys.deckOpen

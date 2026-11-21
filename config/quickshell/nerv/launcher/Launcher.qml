@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
@@ -267,12 +268,22 @@ PanelWindow {
             border { width: 2; color: Theme.accent }
             MouseArea { anchors.fill: parent }
 
+            // Tactical 4-Corner Reticles on Launcher Window
+            Rectangle { x: -2; y: -2; width: 14; height: 3; color: Theme.hazard }
+            Rectangle { x: -2; y: -2; width: 3; height: 14; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; y: -2; width: 14; height: 3; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; y: -2; width: 3; height: 14; color: Theme.hazard }
+            Rectangle { x: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 14; height: 3; color: Theme.hazard }
+            Rectangle { x: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 3; height: 14; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 14; height: 3; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 3; height: 14; color: Theme.hazard }
+
             // Classification header banner: authentic NERV terminal warning
             Rectangle {
                 id: banner
-                x: 0
-                y: 0
-                width: parent.width
+                x: 2
+                y: 2
+                width: parent.width - 4
                 height: 28
                 color: Theme.s2
                 border { width: 1; color: Theme.line }
@@ -454,8 +465,11 @@ PanelWindow {
             // Bottom tactical status footer
             Rectangle {
                 anchors.left: parent.left
+                anchors.leftMargin: 2
                 anchors.right: parent.right
+                anchors.rightMargin: 2
                 anchors.bottom: parent.bottom
+                anchors.bottomMargin: 2
                 height: 24
                 color: Theme.s2
                 border { width: 1; color: Theme.line }
@@ -547,6 +561,7 @@ PanelWindow {
             Rectangle { id: inner; visible: !!cell.modelData.dot; anchors.centerIn: parent; width: 40; height: 40; radius: 0; color: cell.modelData.dot ?? "transparent" }
             Rectangle { visible: !!cell.modelData.now; anchors.centerIn: parent; width: 14; height: 14; radius: 0; color: Theme.on(inner.visible ? inner.color : disc.color) }
             Image {
+                id: iconImg
                 anchors.centerIn: parent
                 visible: status === Image.Ready
                 width: 44
@@ -555,7 +570,13 @@ PanelWindow {
                 sourceSize: Qt.size(44, 44)
                 asynchronous: true
                 retainWhileLoading: true
-                layer.enabled: false
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    colorization: 1.0
+                    colorizationColor: cell.on ? Theme.hazard : Theme.crimson
+                    brightness: cell.on ? 0.15 : -0.05
+                    contrast: 0.25
+                }
             }
             TapHandler { onTapped: { root.sel = cell.modelData.k; root.launch(); } }
             HoverHandler { cursorShape: Qt.PointingHandCursor }

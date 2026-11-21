@@ -319,6 +319,7 @@ PanelWindow {
                         Tile { icon: "\u{F044A}"; name: "record"; on: Sys.rec; picked: root.pick === "rec"; onClicked: { root.close(); Sys.toggleRec(); } onMenu: root.pick = picked ? "" : "rec" }
                         Tile { icon: "\u{F03D8}"; name: Sys.shaderLabel(Sys.shader); on: Sys.shader !== ""; picked: root.pick === "shader"; onClicked: Sys.cycleShader(); onMenu: root.pick = picked ? "" : "shader" }
                         Tile { icon: "\u{F050E}"; name: "dark"; on: !Theme.light; onClicked: Theme.setLight(!Theme.light) }
+                        Tile { icon: "\u{F0506}"; name: "larp"; on: Theme.state.larp ?? false; onClicked: Theme.state.larp = !Theme.state.larp }
                     }
 
                     Rec { width: parent.width; visible: root.pick === "rec"; onTouched: root.pin(); onStart: { root.close(); Sys.toggleRec(); } }
