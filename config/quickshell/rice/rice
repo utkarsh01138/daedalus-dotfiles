@@ -6,7 +6,8 @@
 #   rice restart|kill   restart (and reload Hyprland) / terminate active shell
 #   rice switch <name>  terminate current shell, reset Hyprland to default config, launch new shell
 #   rice lock           run lockscreen for active shell (used by keybind, hypridle, power menu)
-q=$HOME/.config/quickshell
+q=${QUICKSHELL_CONFIG_DIR:-$HOME/.config/quickshell}
+[ -d "$q" ] || q=$HOME/daedalus/config/quickshell
 state=${XDG_STATE_HOME:-$HOME/.local/state}/rice
 cur=$(cat "$state/shell" 2>/dev/null)
 [ -f "$q/$cur/rice.json" ] || cur=glyph

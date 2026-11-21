@@ -1,0 +1,17 @@
+{
+    "name": "NERV",
+    "tagline": "evangelion 3.33 · tactical blood red · zero curves",
+    "title": "FOT-Matisse Pro",
+    "text": "Space Grotesk",
+    "mono": "Space Mono",
+    "bg": "#060608",
+    "surface": "#121216",
+    "line": "#202028",
+    "fg": "#E51D24",
+    "dim": "#787884",
+    "accent": "#E51D24",
+    "crimson": "#E51D24",
+    "hazard": "#FF3B43",
+    "cyan": "#00E5FF",
+    "palette": ["#060608", "#121216", "#202028", "#32323E", "#787884", "#D8D8DC", "#E51D24", "#FF3B43"]
+}

@@ -44,7 +44,8 @@ G=config/quickshell/glyph
 # репо-путь → путь в $HOME
 LINKS=(
     "config/hypr                                .config/hypr"
-    "$G                                         .config/quickshell/glyph"
+    "config/quickshell/glyph                    .config/quickshell/glyph"
+    "config/quickshell/nerv                     .config/quickshell/nerv"
     "config/quickshell/rice                     .config/quickshell/rice"
     "config/quickshell/rice/rice                .local/bin/rice"
     "config/kitty                               .config/kitty"

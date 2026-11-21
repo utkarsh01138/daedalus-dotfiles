@@ -1,0 +1,76 @@
+/* NERV Tactical Command GTK 3 Theme
+   Palette: Bunker Black (#09090B), Panel (#16161A), Amber (#FF8C00), Crimson (#E51D24), Hazard (#FFCC00), Chalk (#EAEAEB)
+   Geometry: ZERO CURVES (0px rounding), strict industrial chamfers and rectangular surfaces */
+@define-color accent_color #FF8C00;
+@define-color accent_bg_color #FF8C00;
+@define-color accent_fg_color #09090B;
+@define-color destructive_color #E51D24;
+@define-color destructive_bg_color #E51D24;
+@define-color destructive_fg_color #EAEAEB;
+@define-color window_bg_color #09090B;
+@define-color window_fg_color #EAEAEB;
+@define-color view_bg_color #16161A;
+@define-color view_fg_color #EAEAEB;
+@define-color headerbar_bg_color #09090B;
+@define-color headerbar_fg_color #FF8C00;
+@define-color headerbar_border_color #2A2A32;
+@define-color headerbar_backdrop_color #09090B;
+@define-color popover_bg_color #16161A;
+@define-color popover_fg_color #EAEAEB;
+@define-color dialog_bg_color #16161A;
+@define-color dialog_fg_color #EAEAEB;
+@define-color card_bg_color #1F1F24;
+@define-color card_fg_color #EAEAEB;
+@define-color sidebar_bg_color #09090B;
+@define-color sidebar_fg_color #EAEAEB;
+@define-color sidebar_border_color #2A2A32;
+@define-color sidebar_backdrop_color #09090B;
+@define-color borders #2A2A32;
+
+/* gtk3 (adw-gtk3) */
+@define-color theme_bg_color #09090B;
+@define-color theme_fg_color #EAEAEB;
+@define-color theme_base_color #16161A;
+@define-color theme_text_color #EAEAEB;
+@define-color theme_selected_bg_color #FF8C00;
+@define-color theme_selected_fg_color #09090B;
+@define-color insensitive_fg_color #3A3A45;
+
+window, popover, menu { font-family: "Space Grotesk"; }
+
+/* Zero curves: strict 0px border radius for military rectangular tactical look */
+button, entry { border-radius: 0px; border: 1px solid #2A2A32; }
+entry { padding-left: 12px; padding-right: 12px; background-color: #16161A; color: #EAEAEB; }
+button:checked { background-color: #FF8C00; color: #09090B; }
+.linked:not(.vertical) > button, .linked:not(.vertical) > entry { border-radius: 0px; }
+.linked.vertical > button, .linked.vertical > entry { border-radius: 0px; }
+popover > contents, popover.background { border-radius: 0px; border: 1px solid #FF8C00; }
+
+switch:checked { background-color: #FF8C00; }
+switch:checked slider { background-color: #09090B; border-radius: 0px; }
+switch slider { border-radius: 0px; }
+
+scrollbar slider { border-radius: 0px; background-color: #3A3A45; }
+scrollbar slider:hover, scrollbar slider:active { background-color: #FF8C00; }
+
+/* ---- Thunar: Tactical telemetry styling ---- */
+.thunar paned > separator { min-width: 8px; background: #09090B; box-shadow: none; }
+
+.thunar .standard-view { background-color: #16161A; border-radius: 0px; border: 1px solid #2A2A32; padding: 6px; margin: 0 8px 0 0; }
+.thunar .standard-view .view:not(.rubberband), .thunar .standard-view .view *:not(.rubberband) { background-color: transparent; }
+.thunar .standard-view .view:selected, .thunar .standard-view .view *:selected { background-color: #FF8C00; color: #09090B; border-radius: 0px; font-weight: bold; }
+.thunar .rubberband { background-color: alpha(#FF8C00, 0.15); border: 1px solid #FF8C00; }
+
+.thunar .sidebar, .thunar .sidebar .view { background: none; }
+.thunar .sidebar .view { padding: 6px 10px; border-radius: 0px; }
+.thunar .sidebar .view:hover { background-color: #1F1F24; color: #FF8C00; }
+.thunar .sidebar .view:selected { background-color: #FF8C00; color: #09090B; font-weight: bold; }
+
+.thunar .path-bar-button { font-family: "Space Mono"; font-size: 11px; letter-spacing: 1px; padding: 4px 10px; border-radius: 0px; border: 1px solid #2A2A32; }
+.thunar .path-bar-button:checked { background-color: #FF8C00; color: #09090B; box-shadow: none; }
+
+.thunar notebook header { background: #09090B; box-shadow: none; border-bottom: 1px solid #2A2A32; }
+.thunar notebook header tab { border-radius: 0px; padding: 4px 14px; box-shadow: none; border: 1px solid transparent; }
+.thunar notebook header tab:checked { background-color: #16161A; color: #FF8C00; border-top: 2px solid #FF8C00; }
+
+.thunar statusbar { font-family: "Space Mono"; font-size: 11px; letter-spacing: 1.5px; color: #8A8A93; padding: 4px 10px; border-top: 1px solid #2A2A32; }
