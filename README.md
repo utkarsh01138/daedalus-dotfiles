@@ -1,168 +1,138 @@
-<div align="center">
-
-<img src="assets/title.svg" width="760" alt="Daedalus Dotfiles: Nothing OS & NERV-ready desktop for Hyprland + Quickshell">
-
 # Project Daedalus Dotfiles
 
-Custom-tailored, production-grade Arch Linux + Hyprland + Quickshell workstation environment engineered for **Hal** (ASUS Vivobook 16X).
+> **Production-grade, bare-metal Arch Linux + Hyprland + Quickshell workstation environment engineered for Hal (ASUS Vivobook 16X).**
 
-<br>
+[![Arch Linux](https://img.shields.io/badge/OS-Arch_Linux-1793D1?logo=arch-linux&logoColor=white)](https://archlinux.org)
+[![Hyprland](https://img.shields.io/badge/Compositor-Hyprland-00FFFF?logo=wayland&logoColor=white)](https://hyprland.org)
+[![QuickShell](https://img.shields.io/badge/Shell-QuickShell-EA80FC)](https://quickshell.outfoxxed.me)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-![Glyph desktop](screenshots/desktop.png)
+---
 
-</div>
+> [!NOTE]
+> **Lineage & Foundation:** Daedalus Dotfiles is built upon the desktop shell foundation of [Nebelung-cloud/glyph-rice](https://github.com/Nebelung-cloud/glyph-rice). It has been heavily re-engineered and extended under **Project Daedalus** with real-time GLSL fragment shaders, omni-search calculations, persistent emoji history, workstation ergonomics, and multi-rice switching capabilities.
 
-<div align="center"><img src="assets/divider-dots.svg" width="720" alt=""></div>
+---
 
-<h2 align="center">What's inside</h2>
+## 🖥️ Machine Hardware Specification (Hal)
 
-| | | |
-|---|---|:---:|
-| **Daedalus Optics** | 14 real-time GLSL shaders (astronomy-red, CRT scanlines, blueprint, e-ink paper, viridis, etc.) with daily cycle & right-click dropdown menu | `Super` `Alt` `O` / `Quick` |
-| **Launcher** | omni-search with live `qalc` math, currency conversion, and silent / Kitty CLI runner | `Super` `Space` |
-| **Charms** | emoji, math letters, symbols, kaomoji with **persistent 30-item recent history** and direct paste | `Super` `.` |
-| **Clip** | clipboard history with direct `Enter` paste insertion and Windows 11-style `···` menu | `Super` `V` |
-| **Deck** | dashboard from the bottom edge with backdrop dismissal | `Super` |
-| **Quick** | quick settings, top-stacked notifications, shader palette tile, media player | `Super` `A` |
-| **Bar** | launcher, workspaces, clock, tray, battery wattage | Top |
-| **Home** | clock, greeting, widgets (cava as a round Glyph Matrix), dot grid | |
-| **Glyph** | screen edges as OSD: volume, brightness, notifications, progress | |
-| **Prefs** | settings, bar and home layout, audio devices | `Super` `I` |
-| **Shot** | screenshots, editor, recording | `Print` |
-| **Walls** | wallpapers as dots | `Super` `Shift` `W` |
-| **VPN** | Clash Verge panel | `Super` `P` |
-| **Cal** | calendar, focus timer | click the clock |
-| **Buds** | Nothing / CMF earbuds: battery, ANC | |
-| **Power** | power menu | `Super` `Esc` |
-| **Lock** | lock screen | `Super` `L` |
-| **Login** | SDDM theme: sessions on a camera dial, a Glyph tachometer that fills as you type, a staged power-on | `←` `→` |
-| **Style** | dynamic color palettes (Nothing, Catppuccin, Rosé Pine, Gruvbox, Nord, Tokyo Night, etc.) | launcher → style |
-| **Rice Engine** | multi-rice switcher (`rice switch <name>`) with instant shell & terminal synchronization | `rice switch <name>` |
+These dotfiles are tailored and tuned for the following hardware architecture:
 
-Also: Hyprland (Lua), hypridle, kitty, fish, starship, fastfetch, btop, cava (dots in fish; `command cava` for bars), GTK, Qt and folder colours.
+| Component | Specification | Details |
+| :--- | :--- | :--- |
+| **Device Model** | **ASUS Vivobook 16X** | `M1603QA_M1603QA` |
+| **Processor (CPU)** | **AMD Ryzen 7 5800HS** | 8 Cores / 16 Threads @ up to 4.4 GHz |
+| **Memory (RAM)** | **16 GB DDR4** | Dual-channel @ 3200 MT/s |
+| **Display Panel** | **16.0" 16:10 WUXGA** | `1920x1200 @ 60Hz` (1.0 Integer Scale, Chimei Innolux `0x1618`) |
+| **Graphics (iGPU)** | **AMD Cezanne Radeon Vega** | Native kernel KMS acceleration |
+| **Audio Subsystem** | **PipeWire 1.6+** | WirePlumber low-latency virtual routing |
+| **Wireless / Bluetooth** | **MediaTek MT7921** | Wi-Fi 6 (802.11ax) + Bluetooth 5.2 |
 
-<div align="center"><img src="assets/divider-glyph.svg" width="720" alt=""></div>
+---
 
-<h2 align="center">Screenshots</h2>
+## ✨ What Daedalus Adds to Glyph
 
-| | |
-|:---:|:---:|
-| ![launcher](screenshots/launcher.png) **Launcher** | ![quick](screenshots/quick.png) **Quick** |
-| ![deck](screenshots/deck.png) **Deck** | ![prefs](screenshots/settings.png) **Prefs** |
-| ![shot](screenshots/shot.png) **Shot** | ![clip](screenshots/clip.png) **Clip** |
-| ![power](screenshots/power.png) **Power** | ![login](screenshots/login.png) **Login** |
+While retaining the clean NothingOS dot-matrix visual aesthetic, **Project Daedalus** introduces significant architectural expansions:
 
-<div align="center"><img src="assets/divider-matrix.svg" width="720" alt=""></div>
+### 🌌 1. Daedalus Optics (14 Real-Time GLSL Fragment Shaders)
+Direct single-pass GLSL ES 3.0 fragment shader injection into Hyprland's composited rendering pipeline at 60 FPS with zero CPU overhead.
+* **CLI Controller:** `/home/utki/.local/bin/daedalus-shader` (symlinked as `shader`).
+* **Daily Rotation Cycle:** Cycles through 6 primary shaders + normal mode:
+  $$\text{astronomy-red} \longrightarrow \text{crt-scanlines} \longrightarrow \text{blueprint} \longrightarrow \text{grayscale} \longrightarrow \text{theme-quantize} \longrightarrow \text{true-black} \longrightarrow \text{off}$$
+* **Quick Actions Sub-Menu:** Right-clicking the Shader tile in Quick Settings opens an integrated catalog displaying both the `daily (6)` rotation and `all (14)` catalog.
+* **Curated Shader Library (`config/hypr/shaders/`):**
+  * `astronomy-red.glsl`: Pure red channel pass stripping 100% of green and blue light to preserve scotopic dark adaptation for telescope stargazing.
+  * `crt-scanlines.glsl`: Subtle horizontal line darkening matched to 1200p with phosphor warmth and vignetting.
+  * `blueprint.glsl`: Prussian-blue architectural cyanotype drafting mode with 32px grid lines.
+  * `paper-mode.glsl`: Reflective E-Ink display emulation with 88% desaturation and deterministic static fiber grain.
+  * `p31-green.glsl`: Tektronix oscilloscope P31 zinc-sulfide phosphor (520 nm peak with mint-white highlights).
+  * `bayer-dither.glsl`: 1-bit monochrome ordered Bayer matrix dithering ($4\times4$) with gamma compensation.
+  * `inferno.glsl` & `viridis.glsl`: Matplotlib scientific colormaps evaluated via 6th-degree polynomial fits.
+  * `theme-quantize.glsl`: Catppuccin Mocha universal palette quantizer via redmean perceptual distance.
+  * `gameboy.glsl`, `virtual-boy.glsl`, `true-black.glsl`, `smart-invert.glsl`, `grayscale.glsl`.
 
-<h2 align="center">Install</h2>
+### 🧮 2. Omni-Search & Mathematical Launcher (`Super + Space`)
+* **Live Calculation & Conversion:** Type any mathematical expression (`2+2`, `sqrt(144)`, `sin(pi/4)`) or currency conversion (`200 usd to inr`, `50 eur to gbp`) directly into the search bar. Real-time evaluations are performed via `/usr/bin/qalc`; pressing `Enter` copies the result.
+* **CLI Execution:** Type any terminal command (e.g. `shader red`, `mnemosyne`, `>top`). Pressing `Enter` executes it silently in the background; pressing `Shift + Enter` launches it inside an interactive Kitty terminal.
 
-```sh
-git clone https://github.com/Nebelung-cloud/glyph-rice ~/.local/share/glyph
-~/.local/share/glyph/install.sh                  # Arch: packages, services, symlinks, login theme
-~/.local/share/glyph/install.sh --with telegram  # same, extras picked up front
-~/.local/share/glyph/install.sh --links          # any distro: symlinks only
-~/.local/share/glyph/install.sh --sddm           # login theme only (sudo); run again after editing it
+### 🎭 3. Persistent Recent History Charms Picker (`Super + .`)
+* **30-Item Recent History:** Automatically tracks the last 30 emojis, symbols, math characters, or kaomoji in strict Most Recently Used (MRU) order, saved persistently to state (`charms-recent.json`).
+* **Category Hierarchy:** `recent` $\rightarrow$ `emoji` $\rightarrow$ `math` $\rightarrow$ `symbols` $\rightarrow$ `kaomoji`.
+* **Instant Action:** Single-click or `Enter` inserts the charm directly into the active text field via `~/.local/bin/copy-and-paste`; Right-click or `Shift + Enter` copies to clipboard.
+* **Omni-Search:** Typing a query (e.g. `pi`, `integral`, `shruggie`) matches across all datasets simultaneously.
+
+### 📋 4. Direct-Insert Clipboard Manager (`Super + V`)
+* **Direct Paste:** Pressing `Enter` or clicking any clipboard card directly pastes it into the active window.
+* **Action Menu:** Windows 11 style `···` menu on every card with quick actions: Copy only, Pin/Unpin, and Delete. `Shift + Enter` copies only.
+
+### 🔔 5. Restructured Quick Actions Panel (`Super + A`)
+* Re-ordered vertical hierarchy: Notifications stack cleanly at the top, followed by Clock/Date, Wi-Fi/Bluetooth pills, action tiles, volume/brightness sliders, and media player.
+* Auto-adapting layout: When no notifications are active, the panel cleanly collapses to start with the Clock.
+
+### 🔄 6. Multi-Rice Architecture (`rice switch`)
+* Built-in multi-rice management engine (`~/.config/quickshell/rice/rice`).
+* Instant 0.5-second hot-swapping between desktop identities:
+  * **NothingOS (`glyph`):** Clean, consumer dot-matrix minimalism for everyday use.
+  * **NERV Tactical (`nge`):** High-urgency, chamfered command bunker HUD for deep focus coding sessions.
+
+---
+
+## ⌨️ Keybindings Reference
+
+| Hotkey | Action | Component |
+| :--- | :--- | :--- |
+| `Super + Space` | Open Omni-Search Launcher (Apps, `qalc` Math, CLI) | Launcher |
+| `Super` | Open Bottom Deck Dashboard (Click outside to dismiss) | Deck |
+| `Super + A` | Open Quick Actions & Notification Center | Quick |
+| `Super + V` | Open Clipboard History (Direct paste on `Enter`) | Clip |
+| `Super + .` | Open Charms & Emoji Picker (30 Recent History) | Charms |
+| `Super + Alt + O` | Toggle Astronomy Red Night Vision Mode | Daedalus Optics |
+| `Super + Shift + O` | Toggle Retro CRT Scanlines | Daedalus Optics |
+| `Ctrl + Super + O` | Instantly clear all active screen shaders | Daedalus Optics |
+| `Super + Shift + W` | Open Wallpaper Selector | Walls |
+| `Super + Shift + T` | In-memory Screen OCR text extraction to clipboard | Daedalus Vision |
+| `Print` | Interactive Screenshot, Annotation, & Recording | Shot |
+| `Super + Esc` | Power, Lock, & Session Menu | Power |
+
+---
+
+## 📦 Installation
+
+### Prerequisites (Arch Linux)
+Hal runs pure Arch Linux. You can install all system packages and dependencies via:
+```bash
+sudo pacman -Syu --needed base-devel git curl jq python \
+    hyprland hypridle hyprsunset xdg-desktop-portal-hyprland \
+    sddm quickshell pipewire wireplumber networkmanager bluez \
+    brightnessctl playerctl wl-clipboard cliphist grim slurp \
+    libqalculate kitty fish starship fastfetch btop cava
 ```
 
-Without `--with` it asks which extras to add: `telegram` (`Super` `D`), `spotify` with Spicetify (`Super` `M`),
-`clash` for the VPN panel. Old configs go to `~/.dots-backup-<date>/`. Wallpapers are read from `~/Pictures/Wallpapers`,
-gifs for the home cat tile from `~/Pictures/Gifs` (pick one in prefs → home, or click the tile; none there — the cat).
+### Deploying the Dotfiles
+```bash
+# Clone the Daedalus Dotfiles repository
+git clone https://github.com/utkarsh01138/daedalus-dotfiles ~/.local/share/glyph
 
-| `config/` | goes to |
-|---|---|
-| `hypr/` | `~/.config/hypr` |
-| `quickshell/glyph/` | `~/.config/quickshell/glyph` |
-| `quickshell/rice/` | `~/.config/quickshell/rice`, `~/.local/bin/rice` |
-| `quickshell/glyph/term/` | `starship.toml` `fastfetch/` `btop/` `cava/` `gtk-*/gtk.css` `qtengine.colors` in `~/.config` (with a Style colour — copies in `~/.local/state/rice/glyph`; edit `term/`) |
-| `kitty/` `qtengine/` | `~/.config/…` |
-| `fish/` | `~/.config/fish` |
-| `fonts/` | `~/.local/share/fonts/glyph` |
-| `sddm/glyph/` | copied to `/usr/share/sddm/themes/glyph` (the `sddm` user can't read your home), set in `/etc/sddm.conf.d/zz-glyph.conf`; to undo, delete both |
+# Apply symlinks to ~/.config/ and ~/.local/bin/
+~/.local/share/glyph/install.sh --links
 
-Monitor, backlight, GPU and sensors are detected. Keyboard layouts are in `hypr/hyprland/input.lua`,
-default apps in `hypr/variables.lua`. Earbuds photo: `quickshell/glyph/buds/<device-name>.png`.
-Your own binds and overrides go in `hypr/user.lua`: it's gitignored, so `git pull` never touches it.
-Apps for the special workspaces and the editor are read when you press the key, so `user.lua` can swap them:
-
-```lua
-local apps = require("variables").apps
-apps.editor = "codium"              -- Super Shift K, empty by default
-apps.todo   = "planify"             -- Super R, empty by default
-apps.music  = "spicetify watch -s"  -- Super M, spotify-launcher by default
-
-hl.bind("SUPER + G", hl.dsp.global("shell:game"))  -- game mode has no key by default
+# (Optional) Full automated install including SDDM greeter:
+# ~/.local/share/glyph/install.sh
 ```
 
-<div align="center"><img src="assets/divider-glyph.svg" width="720" alt=""></div>
+---
 
-<h2 align="center">Dependencies</h2>
+## 🙏 Acknowledgements & Credits
 
-| | |
-|---|---|
-| **Shell** | `quickshell` 0.3.1+ (Qt 6.9+) · `hyprland` 0.56+ · `hypridle` · `hyprsunset` · `xdg-desktop-portal-hyprland` · `jq` · `curl` · `python3` · `libqalculate` |
-| **System** | `sddm` 0.21+ (Qt 6 greeter) · `networkmanager` · `bluez` · `pipewire` · `pipewire-pulse` · `pipewire-alsa` · `wireplumber` · `upower` · `power-profiles-daemon` · `brightnessctl` · `libnotify` · `playerctl` · `polkit-gnome` · `gnome-keyring` · `geoclue` |
-| **Capture** | `grim` · `slurp` · `imagemagick` · `libvips` · `gpu-screen-recorder` · `cliphist` · `wl-clipboard` |
-| **Terminal** | `kitty` · `fish` · `starship` · `fastfetch` · `btop` · `cava` · `eza` · `zoxide` · `direnv` |
-| **Look** | `papirus-icon-theme` · `adw-gtk-theme` · JetBrains Mono Nerd Font · `noto-fonts-emoji` (Emoji 17) · `noto-fonts-cjk` · Bibata · `qtengine` · `darkly` |
-| **Optional** | `clash-verge-rev` · `nvidia-utils` · `ydotool` · `hyprpicker` · `swappy` · `trash-cli` |
+* [**Nebelung-cloud/glyph-rice**](https://github.com/Nebelung-cloud/glyph-rice): The desktop shell foundation from which this rice was derived and extended.
+* [**Nothing Technology Ltd.**](https://nothing.tech): Visual inspiration, Nothing OS typography, and Glyph interface design language.
+* [**Doto**](https://github.com/oliverlalan/Doto): The dot-matrix typeface.
+* [**Qalculate!**](https://qalculate.github.io): Calculation and unit conversion CLI engine.
+* [**Hyprland**](https://hyprland.org): The dynamic tiling Wayland compositor powering Hal.
 
-From the AUR only `qtengine`, `darkly`, Bibata and Zen, plus Spicetify and Clash Verge if picked; all optional. The VPN panel expects Clash Verge in English.
-NixOS: change the `/usr/lib` agent paths in `hypr/hyprland/execs.lua` and the Papirus path in `quickshell/rice/rice`. Take `quickshell` from nixos-unstable: 26.05 ships 0.3.0, where Prefs → AUDIO crashes the shell.
+---
 
-<div align="center"><img src="assets/divider-dots.svg" width="720" alt=""></div>
+## 📄 License
 
-<h2 align="center">Colours</h2>
-
-<div align="center"><img src="assets/palette.svg" width="720" alt="Palette, dark: #000000 #0E0E0E #1A1A1A #2A2A2A #4A4A4A #8C8C8C #F2F2F2 #D71921; light: #E9E9E9 #FFFFFF #F1F1F1 #D9D9D9 #B8B8B8 #6E6E6E #0B0B0B #D71921"></div>
-
-<br>
-
-Dark and light. Red marks the one live thing on screen.
-Fonts: Doto, Space Grotesk, Space Mono, JetBrains Mono Nerd Font.
-
-<div align="center"><img src="assets/divider-glyph.svg" width="720" alt=""></div>
-
-<h2 align="center">Acknowledgements & Credits</h2>
-
-- [**Nebelung-cloud/glyph-rice**](https://github.com/Nebelung-cloud/glyph-rice): The desktop shell foundation from which this rice was derived and extended.
-- [**Nothing OS**](https://nothing.tech): The visual aesthetic, glyph lights, and dot-matrix design language.
-- [**Doto**](https://github.com/oliverlalan/Doto): The dot-matrix typeface.
-- [**Qalculate!**](https://qalculate.github.io): CLI calculation and unit conversion engine powering the omni-launcher.
-- [**Gadgetbridge**](https://codeberg.org/Freeyourgadget/Gadgetbridge): The earbuds protocol in `glyph/ear`.
-- [**Caelestia**](https://github.com/caelestia-dots/shell): Hardware detection and deck structure inspiration.
-
-<div align="center"><img src="assets/divider-matrix.svg" width="720" alt=""></div>
-
-<h2 align="center">License</h2>
-
-[GPL-3.0](LICENSE). Fonts are under the [OFL](config/fonts/OFL.txt), cava shaders keep their MIT headers.
-Nothing, Nothing OS and Glyph are trademarks of Nothing Technology Ltd; this is a fan project, not affiliated with Nothing.
-
-<div align="center"><img src="assets/divider-dots.svg" width="720" alt=""></div>
-
-<div align="center">
-
-```
-ᓚᘏᗢ  · · ·
-```
-
-```
-⠀⠀⠀⠀⣰⣶⣦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣶⣶⡆⠀⠀⠀⠀
-⠀⠀⠀⢠⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣶⣿⣿⣿⣿⣿⠀⠀⠀⠀
-⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀
-⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⣀⣀⣀⣀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀
-⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀
-⠀⠀⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁⠀⠀⠀
-⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⣿⣿⣿⣿⣿⣿⡏⠀⠀⠀⠀
-⠀⠀⠀⠀⣼⣿⣿⣿⣿⡏⠀⠀⢹⣿⣿⣿⣿⣿⣿⠃⠀⠀⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀
-⠀⠀⠀⣸⣿⣿⣿⣿⣿⣷⣀⣀⣼⣿⣿⣿⣿⣿⣿⣦⣀⣠⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀
-⣀⣠⣤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣤⣀⡀
-⠻⠿⠛⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣷⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠛⠿⠇
-⠀⢀⣠⣾⣿⣿⣿⣿⣿⣿⡈⢿⣿⣿⣿⠃⠸⣿⣿⣿⡿⢰⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀
-⠀⢿⠿⠋⢻⣿⣿⣿⣿⣿⣷⣄⣉⣉⣡⣾⣧⣈⣉⣉⣴⣿⣿⣿⣿⣿⣿⠏⠙⢿⡗⠀
-⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⢿⣿⣿⣿⣿⠿⠿⠟⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀
-```
-
-</div>
+This project is licensed under the [GNU General Public License v3.0](LICENSE).  
+Fonts are licensed under the [SIL Open Font License](config/fonts/OFL.txt).
