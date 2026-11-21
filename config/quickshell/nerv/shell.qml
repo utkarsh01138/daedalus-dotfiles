@@ -53,6 +53,7 @@ ShellRoot {
             // Bar and Home widgets can be toggled per monitor in Settings -> Display; wallpaper remains intact.
             // Evaluated here in Scope to prevent window recreation loops when monitor properties change.
             Home { screen: s.modelData; visible: Theme.scr(s.modelData.name, "home") }
+            HudOverlay { screen: s.modelData }
             Hot { screen: s.modelData; onTriggered: quick.peek() }
             Bar {
                 screen: s.modelData

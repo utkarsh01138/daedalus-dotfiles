@@ -75,20 +75,42 @@ stop() {
     kill -9 $pids 2>/dev/null
 }
 
+# Discover shell directory across ~/.config/quickshell and repo directory:
+shell_dir() {
+    for d in "$q/$1" "$HOME/daedalus/config/quickshell/$1" "$HOME/.config/quickshell/$1"; do
+        if [ -f "$d/rice.json" ]; then
+            echo "$d"
+            return 0
+        fi
+    done
+    return 1
+}
+
 case $1 in
     "") echo "$cur" ;;
-    list) for f in "$q"/*/rice.json; do basename "$(dirname "$f")"; done ;;
-    start) [ -n "$(pids "$cur")" ] && exit 0; mkdir -p "$state"; term "$cur"; exec qs -p "$q/$cur" -d ;;
-    restart) term "$cur"; stop "$cur"; hyprctl reload >/dev/null; exec qs -p "$q/$cur" -d ;; # reload also dismisses stuck Hyprland error banners
+    list)
+        for f in "$q"/*/rice.json "$HOME/daedalus/config/quickshell"/*/rice.json; do
+            [ -f "$f" ] && basename "$(dirname "$f")"
+        done | sort -u ;;
+    start)
+        sdir=$(shell_dir "$cur") || sdir="$q/$cur"
+        [ -n "$(pids "$cur")" ] && exit 0
+        mkdir -p "$state"; term "$cur"; exec qs -p "$sdir" -d ;;
+    restart)
+        sdir=$(shell_dir "$cur") || sdir="$q/$cur"
+        term "$cur"; stop "$cur"; hyprctl reload >/dev/null; exec qs -p "$sdir" -d ;;
     kill) stop "$cur" ;;
     switch)
-        [ -f "$q/$2/rice.json" ] || { echo "rice: no shell \"$2\"" >&2; exit 1; }
+        sdir=$(shell_dir "$2") || { echo "rice: no shell \"$2\"" >&2; exit 1; }
+        [ -d "$HOME/.config/quickshell" ] && [ ! -e "$HOME/.config/quickshell/$2" ] && ln -sfn "$sdir" "$HOME/.config/quickshell/$2"
         mkdir -p "$state"
         echo "$2" > "$state/shell"
         stop "$cur"
         hyprctl reload >/dev/null # Reset styling from previous shell before the new one applies its own overrides
         term "$2"
-        exec qs -p "$q/$2" -d ;;
-    lock) pgrep -f '^qs .*/lock[.]qml' >/dev/null || exec qs -p "$q/$cur/lock.qml" ;;
+        exec qs -p "$sdir" -d ;;
+    lock)
+        sdir=$(shell_dir "$cur") || sdir="$q/$cur"
+        pgrep -f '^qs .*/lock[.]qml' >/dev/null || exec qs -p "$sdir/lock.qml" ;;
     *) sed -n '2,8s/^# //p' "$0"; exit 1 ;;
 esac

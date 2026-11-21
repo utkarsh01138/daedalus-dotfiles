@@ -202,14 +202,14 @@ Singleton {
             property bool clock24: true
             property bool blink: true      // Blinking colon indicator on clock displays
             property string name: ""       // Custom display name in home greeting; defaults to $USER if blank
-            property bool grid: true       // Dotted canvas background grid on desktop
-            property bool orb: true        // Half-tone decorative sphere
+            property bool grid: false      // Dotted canvas background grid on desktop (off for NERV wallpaper)
+            property bool orb: false       // Half-tone decorative sphere (off for NERV wallpaper)
             // Wallpaper configuration: path to image; empty shows dot grid and orb. Custom wallpaper directory configurable below
-            property string wall: ""
+            property string wall: "evan_red.png"
             property string wallDir: ""    // Custom wallpaper directory; defaults to ~/Pictures/Wallpapers
-            property int wallLook: 0       // Wallpaper render style: 0 = dotted matrix, 1 = grayscale photo, 2 = full color
+            property int wallLook: 2       // Wallpaper render style: 0 = dotted matrix, 1 = grayscale photo, 2 = full color
             property int wallPitch: 10     // Dot matrix grid spacing in pixels
-            property int wallBright: 85    // Brightness percentage relative to dark background
+            property int wallBright: 100   // Brightness percentage relative to dark background
             property string gif: ""        // Cat widget animated GIF path (services/Gifs); empty picks first in directory
             property string gifDir: ""     // Custom GIF directory; defaults to ~/Pictures/Gifs
             property int rounding: 0       // Hyprland window corner radius: strictly 0px for NERV

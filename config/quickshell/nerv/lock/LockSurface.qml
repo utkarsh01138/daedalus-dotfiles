@@ -53,22 +53,40 @@ WlSessionLockSurface {
             Wall { width: stage.width; height: stage.height; path: Theme.wallSrc(Theme.scr(root.screen?.name, "wall")) }
         }
 
+        // Tactical Emergency Warning Header
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 90
+            spacing: 8
+            opacity: root.ph(0.1, 0.45)
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 14; color: Theme.accent }
+            Text {
+                text: "EMERGENCY // NERV SECURITY PROTOCOL // TERMINAL LOCKED"
+                font.family: Theme.mono
+                font.pixelSize: 13
+                font.bold: true
+                font.letterSpacing: 2
+                color: Theme.hazard
+            }
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 14; color: Theme.accent }
+        }
+
         Lb {
             anchors.horizontalCenter: parent.horizontalCenter
-            y: 170
-            text: root.en.toString(clock.date, "dddd · d MMMM")
-            px: 14
+            y: 150
+            text: root.en.toString(clock.date, "dddd · d MMMM").toUpperCase()
+            px: 13
             opacity: root.ph(0.15, 0.55)
             transform: Translate { y: 16 * (1 - root.ph(0.15, 0.55)) }
         }
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            y: 230
+            y: 200
             opacity: root.ph(0, 0.5)
             transform: Translate { y: -40 * (1 - root.ph(0, 0.5)) }
-            Num { text: Theme.hh(clock.date); font.pixelSize: 400 }
-            Num { text: ":"; font.pixelSize: 400; opacity: root.blink || !Theme.state.blink ? 1 : 0.2 }
-            Num { text: Qt.formatTime(clock.date, "mm"); font.pixelSize: 400 }
+            Num { text: Theme.hh(clock.date); font.pixelSize: 260; color: Theme.fg }
+            Num { text: ":"; font.pixelSize: 260; color: Theme.hazard; opacity: root.blink || !Theme.state.blink ? 1 : 0.2 }
+            Num { text: Qt.formatTime(clock.date, "mm"); font.pixelSize: 260; color: Theme.fg }
         }
         Lb {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -131,16 +149,16 @@ WlSessionLockSurface {
                 transform: Translate { y: 16 * (1 - root.ph(0.4, 0.75)) }
             }
 
-            // поле: введённые — точки, после каретки — погасшие до шести
+            // поле: прямоугольный тактический ввод шифра авторизации
             Rectangle {
                 id: pwd
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: 58 + (380 - 58) * root.ph(0.5, 0.9) // вырастает из точки в пилюлю
-                height: 58
-                radius: Theme.corner(29)
+                width: 58 + (380 - 58) * root.ph(0.5, 0.9)
+                height: 48
+                radius: 0
                 opacity: root.ph(0.45, 0.6)
                 color: Theme.s1
-                border { width: 1; color: root.auth.fail ? Theme.red : Theme.s3 }
+                border { width: 1; color: root.auth.fail ? Theme.red : Theme.accent }
 
                 Row {
                     anchors.centerIn: parent

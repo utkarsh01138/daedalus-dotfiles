@@ -46,6 +46,47 @@ PanelWindow {
         MouseArea { anchors.fill: parent; onClicked: root.close() }
     }
 
+    // Top & Bottom Tactical Alert Tape
+    Rectangle {
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        height: 36
+        color: Theme.s1
+        border { width: 1; color: Theme.accent }
+        Row {
+            anchors.centerIn: parent
+            spacing: 12
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; color: Theme.crimson }
+            Text {
+                text: "/// EMERGENCY OVERRIDE // NERV SYSTEM TERMINATION PROTOCOL // MAGI-01 ///"
+                font.family: Theme.mono
+                font.pixelSize: 12
+                font.bold: true
+                font.letterSpacing: 2
+                color: Theme.hazard
+            }
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 8; height: 8; color: Theme.crimson }
+        }
+    }
+
+    Rectangle {
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        height: 36
+        color: Theme.s1
+        border { width: 1; color: Theme.accent }
+        Row {
+            anchors.centerIn: parent
+            spacing: 12
+            Text {
+                text: "/// ACCESS LEVEL A // HAL-16X // CONFIDENTIAL EMERGENCY CONSOLE ///"
+                font.family: Theme.mono
+                font.pixelSize: 12
+                font.bold: true
+                font.letterSpacing: 2
+                color: Theme.chalk
+            }
+        }
+    }
+
     Stage {
         id: stage
         focus: true

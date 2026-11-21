@@ -12,11 +12,8 @@ import qs.components
 import qs.services
 import qs.settings
 
-// Status bar: pill positioned along the left edge or top screen border (Theme.state.barAt).
-// First item: 16-dot glyph mark (toggles launcher; center turns red during mic/recording activity).
-// Workspaces shown as dot pills, window title, central Doto clock, and tray at the end (click opens Quick Settings).
-// Vertical orientation arranges items in a column; top orientation arranges them in a row.
-// Content, item order, and window title visibility are configured in Theme.state (BAR section).
+// NERV Tactical Command Rail: Edge-to-edge flush top panel with zero curves,
+// MAGI tri-cluster decision consensus, CPU thread oscillograph, and live umbilical/battery telemetry.
 PanelWindow {
     id: root
 
@@ -25,99 +22,91 @@ PanelWindow {
     signal powerClicked
     signal clockClicked
 
-    readonly property bool vert: Theme.state.barAt !== "top" // Default to left side unless explicitly "top"
-    anchors { left: true; right: !vert; top: true; bottom: vert }
-    implicitWidth: Math.ceil(78 * Theme.s)  // Width when vertical
-    implicitHeight: Math.ceil(78 * Theme.s) // Height when horizontal
-    exclusionMode: ExclusionMode.Ignore
+    readonly property bool vert: false
+    anchors { left: true; right: true; top: true }
+    implicitHeight: 36
+    exclusionMode: ExclusionMode.Normal
     color: "transparent"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "glyph-bar"
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.namespace: "nerv-bar"
 
     property bool quickOpen: false
     property bool deckOpen: Sys.deckOpen
     property bool calOpen: false
-    property bool hovered: false
-    readonly property bool revealed: hovered || powOpen || quickOpen || deckOpen || calOpen || Sys.deckOpen
-    property real t: revealed ? 1 : 0
-    Behavior on t { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
+    property bool dim: false
+    Timer { running: Theme.state.blink; interval: 500; repeat: true; onTriggered: root.dim = !root.dim }
 
-    mask: Region {
-        x: 0
-        y: 0
-        width: root.revealed ? root.width : (root.vert ? 3 : root.width)
-        height: root.revealed ? root.height : (root.vert ? root.height : 3)
-    }
-
-    Timer { id: dwell; interval: 120; onTriggered: root.hovered = true }
-    Timer { id: leave; interval: 300; onTriggered: root.hovered = false }
+    // Keep SysStats active for real-time telemetry
+    Binding { target: SysStats; property: "cat"; value: true }
 
     readonly property int active: Hyprland.focusedWorkspace?.id ?? 0
-    // Displays up to 10 workspace dots (minimum 6, expands dynamically when distant workspaces are occupied)
     readonly property int count: Math.min(10, Math.max(6, active, ...Hyprland.workspaces.values.filter(w => w.toplevels.values.length).map(w => w.id)))
     readonly property var top: ToplevelManager.activeToplevel
     readonly property var bat: UPower.displayDevice
     readonly property var wifi: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
 
-    // Hyprland Lua dispatch helper for workspace switching
     function go(ws) { Hyprland.dispatch(`hl.dsp.focus({ workspace = "${ws}" })`); }
 
     SystemClock { id: clock; precision: SystemClock.Minutes }
 
-    Stage {
-        HoverHandler {
-            onHoveredChanged: {
-                if (hovered) {
-                    leave.stop();
-                    if (!root.hovered) dwell.restart();
-                } else {
-                    dwell.stop();
-                    if (root.hovered) leave.restart();
-                }
-            }
+    Rectangle {
+        id: pill
+        anchors.fill: parent
+        radius: 0
+        color: Theme.s1
+        border.width: 0
+
+        // Razor-sharp Evangelion Blood Crimson bottom rail border
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: 1
+            color: Theme.accent
         }
 
-        Rectangle {
-            id: pill
-            x: root.vert ? Math.round(14 - (1 - root.t) * (width + 50)) : 14
-            y: root.vert ? 14 : Math.round(14 - (1 - root.t) * (height + 50))
-            opacity: root.t
-            width: root.vert ? 64 : parent.width - 28
-            height: root.vert ? parent.height - 28 : 64
-            radius: Theme.corner(32)
-            color: Theme.s1
-            border { width: 1; color: Theme.s2 }
+        Notch { onNotch: d => root.go(d > 0 ? "-1" : "+1") }
 
-            Notch { onNotch: d => root.go(d > 0 ? "-1" : "+1") }
+        // Left Cluster: NERV Badge, Tactical Sector Selectors, Window Title
+        Row {
+            id: leftCluster
+            anchors.left: parent.left
+            anchors.leftMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 10
 
-            // NERV Tactical Mark: rectangular chamfered command trigger
-            Item {
+            // NERV Tactical Badge Command Trigger
+            Rectangle {
                 id: mark
-                x: root.vert ? (parent.width - width) / 2 : 18
-                y: root.vert ? 18 : (parent.height - height) / 2
-                width: 36
-                height: 36
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 0
-                    color: Theme.s2
-                    border { width: 1; color: Theme.accent }
+                anchors.verticalCenter: parent.verticalCenter
+                width: 58
+                height: 22
+                radius: 0
+                color: Theme.accent
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 4
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 4
+                        height: 4
+                        color: "#000000"
+                    }
                     Text {
-                        anchors.centerIn: parent
                         text: "NERV"
-                        font { family: Theme.mono; pixelSize: 9; bold: true }
-                        color: !Sys.live ? Theme.chalk : Qt.colorEqual(Theme.accent, Theme.fg) ? Theme.red : Theme.accent
+                        font { family: Theme.mono; pixelSize: 10; bold: true }
+                        color: "#000000"
                     }
                 }
                 MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.markClicked() }
             }
 
-            // Workspace dots: active workspace expands into an elongated white pill, occupied are grey, empty are lines
-            Pile {
+            // Tactical Workspace Sectors
+            Row {
                 id: ws
-                x: root.vert ? (parent.width - width) / 2 : mark.x + mark.width + 24
-                y: root.vert ? mark.y + mark.height + 24 : (parent.height - height) / 2
-                spacing: 8
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
 
                 Repeater {
                     model: root.count
@@ -127,71 +116,80 @@ PanelWindow {
                         readonly property int n: index + 1
                         readonly property bool occ: (Hyprland.workspaces.values.find(w => w.id === n)?.toplevels.values.length ?? 0) > 0
                         readonly property bool on: root.active === n
-                        property real len: on ? 26 : 10
-                        width: root.vert ? 10 : len
-                        height: root.vert ? len : 10
+                        width: 24
+                        height: 22
                         radius: 0
-                        color: on ? Theme.accent : occ ? Theme.grey : Theme.s3
-                        border { width: on ? 1 : 0; color: Theme.hazard }
-                        Behavior on len { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
-                        Behavior on color { ColorAnimation { duration: Theme.t } }
-                        MouseArea { anchors.fill: parent; anchors.margins: -6; onClicked: root.go(parent.n) }
+                        color: on ? Theme.accent : occ ? Theme.s2 : "transparent"
+                        border { width: 1; color: on ? Theme.hazard : occ ? Qt.rgba(0.9, 0.11, 0.14, 0.5) : Theme.s3 }
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Text {
+                            anchors.centerIn: parent
+                            text: String(parent.n).padStart(2, "0")
+                            font { family: Theme.mono; pixelSize: 9; bold: true }
+                            color: parent.on ? "#000000" : parent.occ ? Theme.fg : Theme.mute
+                        }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.go(parent.n) }
                     }
                 }
             }
 
-            // Window title: spans space between workspaces and clock (rotated 90 deg when vertical)
+            // Window Title Bar
             Item {
-                id: title
-                x: root.vert ? (parent.width - width) / 2 : ws.x + ws.width + 24
-                y: root.vert ? ws.y + ws.height + 24 : (parent.height - height) / 2
-                width: root.vert ? 20 : Math.max(0, clk.x - 24 - x)
-                height: root.vert ? Math.max(0, clk.y - 24 - y) : 20
-                clip: true
-                visible: Theme.state.barTitle
-                Lb {
-                    x: (parent.width - width) / 2
-                    y: (parent.height - height) / 2
-                    width: root.vert ? parent.height : parent.width
-                    rotation: root.vert ? 90 : 0
-                    elide: Text.ElideRight
-                    visible: (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0
-                    text: root.top ? `${root.top.appId.split(".").pop()} · ${root.top.title}` : ""
-                    px: 11
-                }
-            }
-
-            // MAGI Consensus Tri-Pill: Left of center clock in top horizontal mode
-            MagiPill {
-                visible: !root.vert
+                id: titleItem
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.right: clk.left
-                anchors.rightMargin: 20
-            }
+                width: Math.max(0, centerCluster.x - leftCluster.x - ws.width - mark.width - 48)
+                height: 22
+                clip: true
+                visible: Theme.state.barTitle && (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0 && !!root.top
 
-            // Clock: vertically stacked hour/minute with day of week (or horizontal row when top). Click toggles calendar/timer.
-            Pile {
-                id: clk
-                anchors.centerIn: parent
-                TapHandler { onTapped: root.clockClicked() }
-                HoverHandler { cursorShape: Qt.PointingHandCursor }
-                Num { text: Theme.hh(clock.date); font.pixelSize: 30 }
-                Num { visible: !root.vert; text: ":"; font.pixelSize: 30 }
-                Num { text: Qt.formatTime(clock.date, "mm"); font.pixelSize: 30 }
-                Lb {
-                    topPadding: root.vert ? 8 : 0
-                    leftPadding: root.vert ? 0 : 12
-                    text: Qt.locale("en_US").toString(clock.date, "ddd d")
-                    px: 10
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 8
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "// [ " + (root.top ? root.top.appId.split(".").pop().toUpperCase() : "") + " ]"
+                        font { family: Theme.mono; pixelSize: 9; bold: true }
+                        color: Theme.accent
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: root.top ? root.top.title : ""
+                        font { family: Theme.ui; pixelSize: 10 }
+                        color: Theme.chalk
+                        elide: Text.ElideRight
+                        width: titleItem.width - 90
+                    }
                 }
             }
+        }
 
-            // System tray: ordered by Theme.state.bar (layout, wifi, bluetooth, sound, notes, battery, runcat, power).
-            // Clicking items opens Quick Settings; power mode and power menu have dedicated actions.
-            Pile {
-                x: root.vert ? (parent.width - width) / 2 : parent.width - width - 22
-                y: root.vert ? parent.height - height - 22 : (parent.height - height) / 2
-                spacing: 20
+        // Center Cluster: MAGI Supercomputer Tri-Cluster + Live CPU Oscillograph
+        Row {
+            id: centerCluster
+            anchors.centerIn: parent
+            spacing: 14
+
+            MagiPill {
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Oscillograph {
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        // Right Cluster: System Telemetry, Tray & Military Clock
+        Row {
+            id: rightCluster
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 12
+
+            // System Tray Items
+            Row {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 12
 
                 Repeater {
                     model: Theme.state.bar
@@ -206,16 +204,80 @@ PanelWindow {
                     }
                 }
             }
+
+            // Hairline separator
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 1
+                height: 18
+                color: Theme.s3
+            }
+
+            // Military Clock in FOT-Matisse Pro
+            Row {
+                id: clk
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 3
+                TapHandler { onTapped: root.clockClicked() }
+                HoverHandler { cursorShape: Qt.PointingHandCursor }
+
+                Num {
+                    text: Theme.hh(clock.date)
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: Theme.fg
+                }
+                Num {
+                    text: ":"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: Theme.hazard
+                    opacity: Theme.state.blink && root.dim ? 0.3 : 1
+                }
+                Num {
+                    text: Qt.formatTime(clock.date, "mm")
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: Theme.fg
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    leftPadding: 4
+                    text: Qt.locale("en_US").toString(clock.date, "ddd").toUpperCase()
+                    font { family: Theme.mono; pixelSize: 9; bold: true }
+                    color: Theme.grey
+                }
+            }
         }
     }
+
     readonly property var parts: ({ layout: layoutC, wifi: wifiC, bluetooth: btC, sound: soundC, notes: notesC, battery: batC, mode: modeC, power: powerC, cat: catC })
-    Component { id: layoutC; Lb { text: Sys.layout; px: 10 } }
-    // RunCat: animated cat whose running speed scales with CPU usage (250ms/frame at idle down to 50ms at 100%).
+
+    // Layout
+    Component {
+        id: layoutC
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: 26
+            height: 18
+            radius: 0
+            color: Theme.s2
+            border { width: 1; color: Theme.s3 }
+            Text {
+                anchors.centerIn: parent
+                text: Sys.layout.toUpperCase()
+                font { family: Theme.mono; pixelSize: 8; bold: true }
+                color: Theme.chalk
+            }
+        }
+    }
+
+    // RunCat
     Component {
         id: catC
         AnimatedImage {
-            width: 44
-            height: 26
+            width: 38
+            height: 22
             source: "runcat.gif"
             mipmap: true
             speed: 1 + 4 * SysStats.cpu
@@ -223,45 +285,50 @@ PanelWindow {
             layer.effect: MultiEffect { brightness: -1 }
         }
     }
-    Binding { target: SysStats; property: "cat"; value: Theme.state.bar.includes("cat") }
-    // Wi-Fi icon: two arcs with central dot (rounded caps); strikethrough diagonal when disabled
+
+    // Wi-Fi
     Component {
         id: wifiC
-        Shape {
-            id: wf
-            width: 20
-            height: 18
-            preferredRendererType: Shape.CurveRenderer
-            readonly property color ink: root.wifi?.connected ? Theme.fg : Theme.grey
-            ShapePath {
-                strokeColor: wf.ink; strokeWidth: 2.2; capStyle: ShapePath.RoundCap; fillColor: "transparent"
-                PathAngleArc { centerX: 10; centerY: 15; radiusX: 5.5; radiusY: 5.5; startAngle: 220; sweepAngle: 100 }
-                PathAngleArc { centerX: 10; centerY: 15; radiusX: 10.5; radiusY: 10.5; startAngle: 220; sweepAngle: 100 }
+        Row {
+            spacing: 4
+            anchors.verticalCenter: parent.verticalCenter
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 5
+                height: 5
+                radius: 0
+                color: root.wifi?.connected ? Theme.crimson : Theme.mute
             }
-            ShapePath {
-                strokeColor: Networking.wifiEnabled ? "transparent" : wf.ink; strokeWidth: 2.2; capStyle: ShapePath.RoundCap
-                startX: 3; startY: 2
-                PathLine { x: 17; y: 17 }
-            }
-            ShapePath {
-                strokeWidth: -1; fillColor: wf.ink
-                PathAngleArc { centerX: 10; centerY: 15; radiusX: 1.9; radiusY: 1.9; startAngle: 0; sweepAngle: 360 }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.wifi?.connected ? "NET:OK" : "NET:OFF"
+                font { family: Theme.mono; pixelSize: 9; bold: true }
+                color: root.wifi?.connected ? Theme.chalk : Theme.grey
             }
         }
     }
+
+    // Bluetooth
     Component {
         id: btC
         Icon {
+            anchors.verticalCenter: parent.verticalCenter
             text: Bluetooth.defaultAdapter?.enabled ? "\u{F00AF}" : "\u{F00B2}"
+            font.pixelSize: 12
             color: Bluetooth.devices.values.some(d => d.connected) ? Theme.fg : Theme.grey
         }
     }
+
+    // Sound
     Component {
         id: soundC
         Row {
-            spacing: 5
-            Icon {
-                text: Sys.muted ? "\u{F075F}" : "\u{F057E}"
+            spacing: 4
+            anchors.verticalCenter: parent.verticalCenter
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Sys.muted ? "[MUT]" : "[VOL]"
+                font { family: Theme.mono; pixelSize: 8; bold: true }
                 color: Sys.muted ? Theme.grey : Theme.crimson
                 Notch { onNotch: d => Sys.setVol(Sys.vol + d * 0.05) }
             }
@@ -269,70 +336,102 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 2
                 Repeater {
-                    model: 10
+                    model: 6
+                    Rectangle {
+                        required property int index
+                        width: 2
+                        height: 9
+                        radius: 0
+                        color: Sys.muted ? Theme.s3 : (index / 6) < Sys.vol ? Theme.crimson : Theme.s3
+                    }
+                }
+            }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Sys.muted ? "0%" : Math.round(Sys.vol * 100) + "%"
+                font { family: Theme.mono; pixelSize: 9; bold: true }
+                color: Sys.muted ? Theme.mute : Theme.chalk
+            }
+        }
+    }
+
+    // Notifications
+    Component {
+        id: notesC
+        Row {
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 4
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: `[N:${Notes.list.length}]`
+                font { family: Theme.mono; pixelSize: 8; bold: true }
+                color: Notes.list.length ? Theme.accent : Theme.mute
+            }
+        }
+    }
+
+    // NERV Umbilical Power Cable & Internal Battery Countdown Gauge
+    Component {
+        id: batC
+        Row {
+            id: batc
+            anchors.verticalCenter: parent.verticalCenter
+            HoverHandler { onHoveredChanged: { root.batHot = hovered; root.peek(batc); } Component.onDestruction: root.batHot = false }
+            spacing: 5
+            readonly property bool ac: !UPower.onBattery
+            readonly property bool charging: root.bat.state === UPowerDeviceState.Charging
+            property real phase: 0
+            readonly property real pulse: charging ? 0.675 + 0.325 * Math.cos(phase * Math.PI / 1.1) : 1
+            Timer { running: batc.charging; interval: 50; repeat: true; onTriggered: batc.phase = (batc.phase + 0.05) % 2.2; onRunningChanged: batc.phase = 0 }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: batc.ac ? "[UMBILICAL]" : "[INT.BAT]"
+                font { family: Theme.mono; pixelSize: 8; bold: true }
+                color: batc.ac ? Theme.chalk : Theme.hazard
+            }
+
+            Row {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 2
+                Repeater {
+                    model: 8
                     Rectangle {
                         required property int index
                         width: 2
                         height: 10
                         radius: 0
-                        color: Sys.muted ? Theme.s3 : (index / 10) < Sys.vol ? Theme.crimson : Theme.s3
-                    }
-                }
-            }
-        }
-    }
-    Component {
-        id: notesC
-        Icon {
-            text: Theme.state.dnd ? "\u{F009B}" : "\u{F009A}"
-            color: Notes.list.length ? Theme.fg : Theme.grey
-        }
-    }
-    // Battery icon: NERV 10-step segmented rectangular gauge
-    Component {
-        id: batC
-        Pile {
-            id: batc
-            HoverHandler { onHoveredChanged: { root.batHot = hovered; root.peek(batc); } Component.onDestruction: root.batHot = false }
-            spacing: 6
-            readonly property bool ac: !UPower.onBattery
-            readonly property bool charging: root.bat.state === UPowerDeviceState.Charging
-            // 20 fps pulsing animation during charging
-            property real phase: 0
-            readonly property real pulse: charging ? 0.675 + 0.325 * Math.cos(phase * Math.PI / 1.1) : 1
-            Timer { running: batc.charging; interval: 50; repeat: true; onTriggered: batc.phase = (batc.phase + 0.05) % 2.2; onRunningChanged: batc.phase = 0 }
-            Icon { visible: batc.ac; text: "\u{F140B}"; font.pixelSize: 13; color: Theme.crimson }
-            Row {
-                spacing: 2
-                Repeater {
-                    model: 10
-                    Rectangle {
-                        required property int index
-                        width: 3
-                        height: 12
-                        radius: 0
-                        color: (index / 10) < root.bat.percentage ? Theme.crimson : Theme.s3
+                        color: (index / 8) < root.bat.percentage ? (root.batLow ? Theme.crimson : Theme.hazard) : Theme.s3
                         opacity: batc.pulse
                     }
                 }
             }
-            Lb {
-                width: full.implicitWidth
-                horizontalAlignment: Text.AlignHCenter
-                text: Math.round(root.bat.percentage * 100) + "%"
-                px: 10
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: {
+                    if (batc.ac) return Math.round(root.bat.percentage * 100) + "%";
+                    if (root.bat.timeToEmpty > 0) {
+                        const m = Math.floor(root.bat.timeToEmpty / 60);
+                        const s = Math.floor(root.bat.timeToEmpty % 60);
+                        return `${m}:${s < 10 ? "0" : ""}${s}`;
+                    }
+                    return Math.round(root.bat.percentage * 100) + "%";
+                }
+                font { family: Theme.mono; pixelSize: 9; bold: true }
                 color: root.batLow ? Theme.crimson : Theme.chalk
             }
-            Lb { id: full; visible: false; text: "100%"; px: 10 }
         }
     }
-    // Performance mode ticks (Rules.modes): clicking cycles modes; hovering reveals detailed popover card
+
+    // Performance Mode
     Component {
         id: modeC
         Item {
             id: ticks
-            width: 40
-            height: 22
+            anchors.verticalCenter: parent.verticalCenter
+            width: 32
+            height: 18
             Row {
                 anchors.centerIn: parent
                 spacing: 2
@@ -341,9 +440,9 @@ PanelWindow {
                     Rectangle {
                         required property int index
                         anchors.bottom: parent.bottom
-                        width: 3
-                        height: 5 + index * 3
-                        radius: 1.5
+                        width: 2
+                        height: 4 + index * 3
+                        radius: 0
                         color: index <= Rules.mode ? Theme.fg : Theme.s3
                     }
                 }
@@ -352,23 +451,33 @@ PanelWindow {
             TapHandler { onTapped: Rules.setMode((Rules.mode + 1) % Rules.modeCount) }
         }
     }
+
+    // Power Trigger
     Component {
         id: powerC
-        Icon {
-            text: "\u{F0425}"
-            color: pwr.hovered ? Theme.fg : Theme.grey
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: 34
+            height: 18
+            radius: 0
+            color: pwr.hovered ? Theme.accent : Theme.s2
+            border { width: 1; color: Theme.accent }
+            Text {
+                anchors.centerIn: parent
+                text: "PWR"
+                font { family: Theme.mono; pixelSize: 8; bold: true }
+                color: pwr.hovered ? "#000000" : Theme.chalk
+            }
             HoverHandler { id: pwr; cursorShape: Qt.PointingHandCursor }
             TapHandler { onTapped: root.powerClicked() }
         }
     }
 
-    // ---- Battery & Power mode popover: hovering battery or ticks opens an informational card.
-    // Shows Doto battery percentage, charge status, segmented gauge, and power profile tiles. ----
+    // ---- Battery & Power mode popover: hovering battery or ticks opens diagnostic card ----
     property bool batHot: false
     property bool tickHot: false
     readonly property bool powHot: batHot || tickHot || popHov.hovered
     readonly property bool batLow: UPower.onBattery && root.bat.percentage < 0.15
-    // Popover anchors relative to the hovered item (battery or power mode ticks) without jumping
     property point popAt
     function peek(it) { if (!pop.visible) popAt = it.mapToItem(pill, it.width, it.height); }
     property bool powOpen: false
@@ -387,11 +496,10 @@ PanelWindow {
         property real t: root.powOpen ? 1 : 0
         Behavior on t { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
         visible: t > 0
-        // Anchored with a 14px gap from the inner edge of the bar pill
         anchor.item: pill
-        anchor.rect: root.vert ? Qt.rect(pill.width + 14, root.popAt.y, 1, 1) : Qt.rect(root.popAt.x, pill.height + 14, 1, 1)
+        anchor.rect: Qt.rect(root.popAt.x, pill.height + 4, 1, 1)
         anchor.edges: Edges.Top | Edges.Left
-        anchor.gravity: root.vert ? Edges.Top | Edges.Right : Edges.Bottom | Edges.Left
+        anchor.gravity: Edges.Bottom | Edges.Left
         implicitWidth: Math.ceil(440 * Theme.s)
         implicitHeight: Math.ceil(card.height * Theme.s)
         color: "transparent"
@@ -401,11 +509,10 @@ PanelWindow {
                 id: card
                 width: 440
                 height: body.height + 52
-                radius: Theme.corner(36)
+                radius: 0
                 color: Theme.s1
-                border { width: 1; color: Theme.s2 }
+                border { width: 1; color: Theme.accent }
                 opacity: pop.t
-                transform: Translate { x: root.vert ? -16 * (1 - pop.t) : 0; y: root.vert ? 0 : -16 * (1 - pop.t) }
                 HoverHandler { id: popHov }
 
                 Column {
@@ -415,19 +522,36 @@ PanelWindow {
                     width: parent.width - 52
                     spacing: 18
 
+                    // Diagnostic header
+                    Rectangle {
+                        width: parent.width
+                        height: 22
+                        radius: 0
+                        color: Theme.s2
+                        border { width: 1; color: Theme.line }
+                        Text {
+                            anchors.centerIn: parent
+                            text: "[ POWER TELEMETRY // UMBILICAL MONITOR ]"
+                            font.family: Theme.mono
+                            font.pixelSize: 10
+                            font.bold: true
+                            color: Theme.hazard
+                        }
+                    }
+
                     Row {
                         spacing: 14
-                        Num { text: Math.round(root.bat.percentage * 100); font.pixelSize: 72 }
+                        Num { text: Math.round(root.bat.percentage * 100); font.pixelSize: 64 }
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 6
-                            Lb { text: "% battery"; color: Theme.fg }
+                            Lb { text: "% battery charge"; color: Theme.fg }
                             Lb { text: root.batState }
                         }
                     }
                     Seg { width: parent.width; height: 6; n: 24; f: root.bat.percentage; on: root.batLow ? Theme.red : Theme.fg }
 
-                    Lb { topPadding: 6; text: "power mode" }
+                    Lb { topPadding: 6; text: "power mode selector" }
                     Row {
                         spacing: (body.width - Rules.modeCount * 80) / Math.max(1, Rules.modeCount - 1)
                         Repeater {
@@ -440,10 +564,10 @@ PanelWindow {
                                 Rectangle {
                                     width: 80
                                     height: 80
-                                    radius: 40
+                                    radius: 0
                                     color: mo.on ? Theme.fg : moHov.hovered ? Theme.s3 : Theme.s2
+                                    border { width: mo.on ? 2 : 1; color: mo.on ? Theme.hazard : Theme.line }
                                     Behavior on color { ColorAnimation { duration: Theme.t } }
-                                    // Power mode indicator ticks: height corresponds to performance tier
                                     Row {
                                         anchors.centerIn: parent
                                         spacing: 4
@@ -454,7 +578,7 @@ PanelWindow {
                                                 anchors.bottom: parent.bottom
                                                 width: 5
                                                 height: 8 + index * 6
-                                                radius: 2.5
+                                                radius: 0
                                                 color: index <= mo.index ? (mo.on ? Theme.ink : Theme.fg) : (mo.on ? Theme.mute : Theme.s3)
                                             }
                                         }

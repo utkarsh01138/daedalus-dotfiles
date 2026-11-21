@@ -3,20 +3,20 @@
     "logo": {
         "type": "file",
         "source": "~/.config/fastfetch/logo.txt",
-        "color": { "1": "31", "2": "33" },
+        "color": { "1": "31", "2": "37" },
         "padding": { "top": 1, "left": 2, "right": 6 }
     },
     "display": {
         "separator": " : ",
-        "color": { "keys": "33", "title": "31", "output": "97", "separator": "90" },
-        "percent": { "color": { "green": "33", "yellow": "33", "red": "31" } }
+        "color": { "keys": "31", "title": "31", "output": "97", "separator": "90" },
+        "percent": { "color": { "green": "31", "yellow": "31", "red": "91" } }
     },
     "modules": [
         "break",
         { "type": "custom", "format": "\u001b[1;31m[ NERV SPECIAL AGENCY // TACTICAL COMMAND // HAL ]\u001b[0m" },
-        { "type": "custom", "format": "\u001b[33m\"GOD'S IN HIS HEAVEN. ALL'S RIGHT WITH THE WORLD.\"\u001b[0m" },
+        { "type": "custom", "format": "\u001b[37m\"GOD'S IN HIS HEAVEN. ALL'S RIGHT WITH THE WORLD.\"\u001b[0m" },
         { "type": "separator", "string": "─", "outputColor": "31" },
-        { "type": "title", "color": { "user": "1;33", "at": "90", "host": "1;31" } },
+        { "type": "title", "color": { "user": "1;31", "at": "90", "host": "1;37" } },
         { "type": "os", "key": "[ OS ]      " },
         { "type": "kernel", "key": "[ KERNEL ]  ", "format": "{release}" },
         { "type": "wm", "key": "[ WM ]      ", "format": "{pretty-name}" },

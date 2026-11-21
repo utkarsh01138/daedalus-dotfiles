@@ -56,27 +56,47 @@ PanelWindow {
         // раскладка под бар слева; бар сверху или снят с экрана — на его полширины влево, по центру
         x: Theme.state.barAt === "top" || !Theme.scr(root.screen?.name, "bar") ? -39 * Theme.s : 0
 
+        // Tactical Terminal Header Stamp
+        Row {
+            x: 104
+            y: 72
+            spacing: 8
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 12; color: Theme.accent }
+            Text {
+                text: "NERV TACTICAL COMMAND // MAGI-01 SYS v4.19"
+                font.family: Theme.mono
+                font.pixelSize: 11
+                font.bold: true
+                color: Theme.hazard
+                font.letterSpacing: 1.5
+            }
+        }
+
         Row {
             x: 100
-            y: 90
+            y: 95
             spacing: 2
-            Num { text: Theme.hh(clock.date); font.pixelSize: 120 }
-            Num { text: ":"; font.pixelSize: 120; opacity: Theme.state.blink && root.dim ? 0.2 : 1 }
-            Num { text: Qt.formatTime(clock.date, "mm"); font.pixelSize: 120 }
-        }
-        Lb {
-            x: 104
-            y: 220
-            text: `${root.en.toString(clock.date, "dddd · d MMMM")} · week ${root.week(clock.date)}`
-            px: 13
+            Num { text: Theme.hh(clock.date); font.pixelSize: 120; color: Theme.fg }
+            Num { text: ":"; font.pixelSize: 120; color: Theme.hazard; opacity: Theme.state.blink && root.dim ? 0.2 : 1 }
+            Num { text: Qt.formatTime(clock.date, "mm"); font.pixelSize: 120; color: Theme.fg }
         }
         Text {
             x: 104
-            y: 270
+            y: 226
+            text: `DATE: ${Qt.formatDate(clock.date, "yyyy.MM.dd")} [${root.en.toString(clock.date, "dddd").toUpperCase()}] · WEEK ${root.week(clock.date)}`
+            font.family: Theme.mono
+            font.pixelSize: 12
+            font.bold: true
+            color: Theme.chalk
+            font.letterSpacing: 1.2
+        }
+        Text {
+            x: 104
+            y: 260
             textFormat: Text.StyledText
-            text: `${root.hello},<br><font color="${Theme.grey}">${(Theme.state.name || Quickshell.env("USER")).replace(/&/g, "&amp;").replace(/</g, "&lt;")}.</font>`
-            font { family: Theme.ui; pixelSize: 34; weight: Font.Light; letterSpacing: -0.5 }
-            lineHeight: 1.1
+            text: `OPERATOR: <font color="${Theme.hazard}">${(Theme.state.name || Quickshell.env("USER")).toUpperCase()}</font><br><font color="${Theme.grey}">CLEARANCE: LEVEL-A // STATUS: NORMAL</font>`
+            font { family: Theme.mono; pixelSize: 14; bold: true; letterSpacing: 1 }
+            lineHeight: 1.2
             color: Theme.fg
         }
         Row {

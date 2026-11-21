@@ -79,9 +79,9 @@ PanelWindow {
                 width: 470
                 height: col.height + 44
                 opacity: root.t
-                radius: Theme.corner(36)
+                radius: 0
                 color: Theme.s1
-                border { width: 1; color: Theme.s2 }
+                border { width: 1; color: Theme.accent }
                 focus: true
                 Keys.onEscapePressed: root.close()
                 MouseArea { anchors.fill: parent } // Clicking inside the panel does not dismiss it
