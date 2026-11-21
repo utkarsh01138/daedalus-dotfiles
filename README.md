@@ -70,10 +70,12 @@ Direct single-pass GLSL ES 3.0 fragment shader injection into Hyprland's composi
 * Auto-adapting layout: When no notifications are active, the panel cleanly collapses to start with the Clock.
 
 ### 🔄 6. Multi-Rice Architecture (`rice switch`)
-* Built-in multi-rice management engine (`~/.config/quickshell/rice/rice`).
-* Instant 0.5-second hot-swapping between desktop identities:
-  * **NothingOS (`glyph`):** Clean, consumer dot-matrix minimalism for everyday use.
-  * **NERV Tactical (`nge`):** High-urgency, chamfered command bunker HUD for deep focus coding sessions.
+Built-in desktop profile switching engine (`~/daedalus/config/quickshell/rice/rice`) supporting atomic hot-swapping between **5 operational desktop profiles** with zero muscle-memory friction:
+* **`glyph` (NothingOS):** Clean dot-matrix minimalism & Android companion widgets (Daily Driver).
+* **`nge` (NERV / MAGI):** Dual-mode tactical bunker HUD & clinical laboratory dossier for high-urgency C/C++ coding.
+* **`glass` (Liquid Acrylic):** Floating translucent frosted glass with specular refraction and dual-kawase blur (Creative Studio).
+* **`astro` (Deep Space):** Pure pitch `#000000` OLED black, stellar spectral classes (O-B-A-F-G-K-M), and moon phase HUD (Nocturnal Observatory).
+* **`fjord` (Nordic Sanctuary):** Soothing glacial blues and soft polar night slate for low-cognitive-load focus and eye recovery.
 
 ---
 
