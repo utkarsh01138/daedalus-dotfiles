@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# Daedalus Optics: Real-Time Screen Shader Manager for Hyprland 0.57+
+SHADER_DIR="$HOME/.config/hypr/shaders"
+
+get_current() {
+    hyprctl getoption decoration:screen_shader -j 2>/dev/null | jq -r '.str // empty' 2>/dev/null
+}
+
+get_current_name() {
+    local cur
+    cur="$(get_current)"
+    if [ -n "$cur" ] && [ "$cur" != "null" ]; then
+        basename "$cur" .glsl
+    else
+        echo ""
+    fi
+}
+
+get_all_shaders() {
+    local list=()
+    shopt -s nullglob
+    for f in "$SHADER_DIR"/*.glsl; do
+        list+=("$f")
+    done
+    shopt -u nullglob
+    printf '%s\n' "${list[@]}"
+}
+
+apply_shader() {
+    local file="$1"
+    local name="$2"
+    local quiet="$3"
+    if [ -f "$file" ]; then
+        hyprctl eval "hl.config({ decoration = { screen_shader = \"$file\" } })" >/dev/null 2>&1
+        notify-send --app-name="Daedalus Optics" -i video-display "Daedalus Optics" "Active: $name" 2>/dev/null || true
+        if [ "$quiet" != "--short" ] && [ "$quiet" != "-q" ]; then
+            echo "[+] Activated: $name"
+        fi
+    else
+        echo "[!] Error: Shader file not found: $file" >&2
+        exit 1
+    fi
+}
+
+clear_shader() {
+    local quiet="$1"
+    hyprctl eval 'hl.config({ decoration = { screen_shader = "" } })' >/dev/null 2>&1
+    notify-send --app-name="Daedalus Optics" -i video-display "Daedalus Optics" "Screen shader disabled" 2>/dev/null || true
+    if [ "$quiet" != "--short" ] && [ "$quiet" != "-q" ]; then
+        echo "[*] Screen shader disabled (normal display)"
+    fi
+}
+
+# Daily quick cycle rotation
+DAILY_ROTATION=(
+    "astronomy-red"
+    "crt-scanlines"
+    "blueprint"
+    "grayscale"
+    "theme-quantize"
+    "true-black"
+)
+
+cycle_shader() {
+    local quiet="$1"
+    local current
+    current="$(get_current_name)"
+    local target=""
+    local found=-1
+
+    for i in "${!DAILY_ROTATION[@]}"; do
+        if [ "${DAILY_ROTATION[$i]}" = "$current" ]; then
+            found=$i
+            break
+        fi
+    done
+
+    if [ $found -ge 0 ]; then
+        local next_idx=$(( found + 1 ))
+        if [ $next_idx -lt ${#DAILY_ROTATION[@]} ]; then
+            target="${DAILY_ROTATION[$next_idx]}"
+        else
+            target="off"
+        fi
+    else
+        target="${DAILY_ROTATION[0]}"
+    fi
+
+    if [ "$target" = "off" ]; then
+        clear_shader "$quiet"
+        [ "$quiet" = "--short" ] && echo ""
+    else
+        apply_shader "$SHADER_DIR/$target.glsl" "$target" "$quiet"
+        [ "$quiet" = "--short" ] && echo "$target"
+    fi
+    return 0
+}
+
+case "$1" in
+    cycle|next)
+        cycle_shader "$2"
+        ;;
+    current)
+        get_current_name
+        ;;
+    red|astronomy|astro)
+        apply_shader "$SHADER_DIR/astronomy-red.glsl" "astronomy-red" "$2"
+        ;;
+    crt|retro)
+        apply_shader "$SHADER_DIR/crt-scanlines.glsl" "crt-scanlines" "$2"
+        ;;
+    mono|gray|grayscale)
+        apply_shader "$SHADER_DIR/grayscale.glsl" "grayscale" "$2"
+        ;;
+    dither|bayer)
+        apply_shader "$SHADER_DIR/bayer-dither.glsl" "bayer-dither" "$2"
+        ;;
+    p31|green|phosphor)
+        apply_shader "$SHADER_DIR/p31-green.glsl" "p31-green" "$2"
+        ;;
+    invert|smart-invert)
+        apply_shader "$SHADER_DIR/smart-invert.glsl" "smart-invert" "$2"
+        ;;
+    paper|eink|e-ink)
+        apply_shader "$SHADER_DIR/paper-mode.glsl" "paper-mode" "$2"
+        ;;
+    gameboy|gb)
+        apply_shader "$SHADER_DIR/gameboy.glsl" "gameboy" "$2"
+        ;;
+    black|crush|true-black)
+        apply_shader "$SHADER_DIR/true-black.glsl" "true-black" "$2"
+        ;;
+    inferno)
+        apply_shader "$SHADER_DIR/inferno.glsl" "inferno" "$2"
+        ;;
+    viridis)
+        apply_shader "$SHADER_DIR/viridis.glsl" "viridis" "$2"
+        ;;
+    blueprint|cyanotype)
+        apply_shader "$SHADER_DIR/blueprint.glsl" "blueprint" "$2"
+        ;;
+    theme|quantize|mocha)
+        apply_shader "$SHADER_DIR/theme-quantize.glsl" "theme-quantize" "$2"
+        ;;
+    vboy|virtualboy|virtual-boy)
+        apply_shader "$SHADER_DIR/virtual-boy.glsl" "virtual-boy" "$2"
+        ;;
+    off|clear|none)
+        clear_shader "$2"
+        [ "$2" = "--short" ] && echo ""
+        ;;
+    toggle)
+        TARGET="${2:-astronomy-red}"
+        case "$TARGET" in
+            red|astro|astronomy) TARGET="astronomy-red" ;;
+            crt|retro) TARGET="crt-scanlines" ;;
+            mono|gray|grayscale) TARGET="grayscale" ;;
+            dither|bayer) TARGET="bayer-dither" ;;
+            p31|green|phosphor) TARGET="p31-green" ;;
+            invert|smart-invert) TARGET="smart-invert" ;;
+            paper|eink|e-ink) TARGET="paper-mode" ;;
+            gameboy|gb) TARGET="gameboy" ;;
+            black|crush|true-black) TARGET="true-black" ;;
+            blueprint|cyanotype) TARGET="blueprint" ;;
+            theme|quantize|mocha) TARGET="theme-quantize" ;;
+            vboy|virtualboy|virtual-boy) TARGET="virtual-boy" ;;
+        esac
+        CURRENT="$(get_current)"
+        if [[ "$CURRENT" == *"$TARGET"* ]]; then
+            clear_shader "$3"
+            [ "$3" = "--short" ] && echo ""
+        else
+            if [ -f "$SHADER_DIR/$TARGET.glsl" ]; then
+                apply_shader "$SHADER_DIR/$TARGET.glsl" "$TARGET" "$3"
+                [ "$3" = "--short" ] && echo "$TARGET"
+            else
+                "$0" "$TARGET" "$3"
+            fi
+        fi
+        ;;
+    status)
+        if [ "$2" = "--short" ] || [ "$2" = "-s" ]; then
+            get_current_name
+        else
+            CURRENT="$(get_current)"
+            if [ -z "$CURRENT" ] || [ "$CURRENT" = "null" ]; then
+                echo "Daedalus Optics: Off (Normal Display)"
+            else
+                echo "Daedalus Optics: Active ($(basename "$CURRENT" .glsl))"
+            fi
+        fi
+        ;;
+    ls|list)
+        echo "Available Daedalus Optics Shaders ($SHADER_DIR):"
+        for s in "$SHADER_DIR"/*.glsl; do
+            [ -f "$s" ] && echo "  - $(basename "$s" .glsl)"
+        done
+        ;;
+    *)
+        # Check if argument matches any custom shader file in SHADER_DIR
+        if [ -n "$1" ] && [ -f "$SHADER_DIR/$1.glsl" ]; then
+            apply_shader "$SHADER_DIR/$1.glsl" "$1" "$2"
+            [ "$2" = "--short" ] && echo "$1"
+        elif [ -n "$1" ] && [ -f "$1" ]; then
+            NAME="$(basename "$1" .glsl)"
+            apply_shader "$1" "$NAME" "$2"
+            [ "$2" = "--short" ] && echo "$NAME"
+        else
+            echo "Daedalus Optics: Screen Shader Manager"
+            echo "Usage: shader <command>"
+            echo ""
+            echo "Commands:"
+            echo "  cycle, next      Cycle to next shader (or off if at end)"
+            echo "  current          Print name of active shader (or empty if off)"
+            echo "  red, astro       Activate Astronomy Night-Vision"
+            echo "  crt, retro       Activate Retro CRT Scanline"
+            echo "  amber, night     Activate Deep Amber Melatonin Shift"
+            echo "  mono, gray       Activate Monochrome Focus"
+            echo "  <custom_name>    Activate any custom shader in $SHADER_DIR"
+            echo "  off              Disable shaders and restore normal colors"
+            echo "  toggle [name]    Toggle between chosen shader and normal display"
+            echo "  status           Show current shader status"
+            echo "  list, ls         List available shaders"
+        fi
+        ;;
+esac
+exit 0

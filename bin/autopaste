@@ -1,0 +1,7 @@
+#!/bin/sh
+sleep 0.08
+CLASS=$(hyprctl activewindow -j | grep -o ""class": "[^"]*"" | head -n1 | cut -d" -f4 | tr "[:upper:]" "[:lower:]")
+case "$CLASS" in
+  *kitty*|*foot*|*alacritty*|*wezterm*|*ghostty*|*konsole*) wtype -M ctrl -M shift -k v -m shift -m ctrl ;;
+  *) wtype -M ctrl -k v -m ctrl ;;
+esac
