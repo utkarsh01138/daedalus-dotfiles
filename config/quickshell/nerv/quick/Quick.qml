@@ -127,17 +127,18 @@ PanelWindow {
                             readonly property var n: modelData
                             width: notes.width
                             height: body.height + 32
-                            radius: Theme.corner(26)
+                            radius: 0
                             color: Theme.s2
-                            border { width: n.urgency === NotificationUrgency.Critical ? 1 : 0; color: Theme.red }
+                            border { width: 1; color: n.urgency === NotificationUrgency.Critical ? Theme.red : Theme.line }
 
                             Rectangle {
                                 x: 18
                                 y: 16
                                 width: 42
                                 height: 42
-                                radius: 21
+                                radius: 0
                                 color: Theme.s3
+                                border { width: 1; color: Theme.line }
                                 Icon { anchors.centerIn: parent; text: "\u{F009A}"; visible: !nicon.visible }
                                 Image {
                                     id: nicon
@@ -185,22 +186,45 @@ PanelWindow {
                     Column {
                         id: controls
                         width: parent.width
-                        spacing: 16
+                        spacing: 14
+
+                    // NERV Tactical Control Header
+                    Rectangle {
+                        width: parent.width
+                        height: 26
+                        radius: 0
+                        color: Theme.s2
+                        border { width: 1; color: Theme.line }
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 8
+                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
+                            Text {
+                                text: "[ NERV TACTICAL CONTROL // SYSTEM BUS 01 ]"
+                                font.family: Theme.mono
+                                font.pixelSize: 10
+                                font.bold: true
+                                font.letterSpacing: 1.2
+                                color: Theme.hazard
+                            }
+                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
+                        }
+                    }
 
                     Item {
                         width: parent.width
-                        height: 54
+                        height: 48
                         Row {
-                            x: 6
+                            x: 4
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 14
-                            Num { anchors.verticalCenter: parent.verticalCenter; text: `${Theme.hh(clock.date)}:${Qt.formatTime(clock.date, "mm")}`; font.pixelSize: 44 }
-                            Lb { anchors.verticalCenter: parent.verticalCenter; text: Qt.locale("en_US").toString(clock.date, "ddd d MMM") }
+                            spacing: 12
+                            Num { anchors.verticalCenter: parent.verticalCenter; text: `${Theme.hh(clock.date)}:${Qt.formatTime(clock.date, "mm")}`; font.pixelSize: 36; color: Theme.fg }
+                            Lb { anchors.verticalCenter: parent.verticalCenter; text: Qt.locale("en_US").toString(clock.date, "ddd d MMM").toUpperCase(); px: 11 }
                         }
                         Row {
-                            anchors { right: parent.right; rightMargin: 6; verticalCenter: parent.verticalCenter }
-                            spacing: 14
-                            Round { icon: "\u{F0493}"; onClicked: { root.close(); root.settingsRequested(); } } // Settings; shells are configured via their respective SHELL
+                            anchors { right: parent.right; rightMargin: 4; verticalCenter: parent.verticalCenter }
+                            spacing: 10
+                            Round { icon: "\u{F0493}"; onClicked: { root.close(); root.settingsRequested(); } } // Settings
                             Round { icon: "\u{F0425}"; onClicked: { root.close(); root.powerRequested(); } }
                         }
                     }
@@ -249,9 +273,10 @@ PanelWindow {
                         Rectangle {
                             id: anc
                             width: parent.width
-                            height: 54
-                            radius: Theme.corner(27)
+                            height: 48
+                            radius: 0
                             color: Theme.s2
+                            border { width: 1; color: Theme.line }
                             readonly property real cell: (width - 12) / Sys.ancModes.length
                             readonly property int at: Sys.ancModes.findIndex(m => m[0] === Sys.ear?.mode)
                             Rectangle {
@@ -260,8 +285,9 @@ PanelWindow {
                                 y: 6
                                 width: anc.cell
                                 height: parent.height - 12
-                                radius: height / 2
-                                color: Theme.fg
+                                radius: 0
+                                color: Theme.accent
+                                border { width: 1; color: Theme.hazard }
                                 Behavior on x { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
                             }
                             Repeater {
@@ -273,7 +299,7 @@ PanelWindow {
                                     x: 6 + anc.cell * index
                                     width: anc.cell
                                     height: anc.height
-                                    Lb { anchors.centerIn: parent; text: am.modelData[1]; color: anc.at === am.index ? Theme.ink : Theme.grey }
+                                    Lb { anchors.centerIn: parent; text: am.modelData[1]; color: anc.at === am.index ? "#000000" : Theme.grey }
                                     TapHandler { onTapped: { root.pin(); Sys.setAnc(am.modelData[0]); } }
                                     HoverHandler { cursorShape: Qt.PointingHandCursor }
                                 }
@@ -301,26 +327,26 @@ PanelWindow {
                     Slider { icon: "\u{F00E0}"; visible: Sys.hasBri; value: Sys.bri; onMoved: v => Sys.setBri(v) }
                     Slider { icon: Sys.muted ? "\u{F075F}" : "\u{F057E}"; value: Sys.muted ? 0 : Sys.vol; onMoved: v => Sys.setVol(v) }
 
-                    // Power profile mode selector, similar to Caelestia: four segmented cells, white fill indicator glides to the selected mode; tick marks indicate intensity.
-                    // Ultra mode caps refresh rate to 60 Hz and disables animations, blur, and window shadows (Rules.modes)
-                    // Right button: Game mode toggle (Rules.store.game) — disables animations, blur, shadows, and gaps; enables tearing
+                    // Power profile mode selector
                     Row {
                         width: parent.width
                         spacing: 12
                         Rectangle {
                             id: modes
                             width: parent.width - game.width - 12
-                            height: 54
-                            radius: Theme.corner(27)
+                            height: 48
+                            radius: 0
                             color: Theme.s2
+                            border { width: 1; color: Theme.line }
                             readonly property real cell: (width - 12) / Rules.modeCount
                             Rectangle {
                                 x: 6 + modes.cell * Rules.mode
                                 y: 6
                                 width: modes.cell
                                 height: parent.height - 12
-                                radius: height / 2
-                                color: Theme.fg
+                                radius: 0
+                                color: Theme.accent
+                                border { width: 1; color: Theme.hazard }
                                 Behavior on x { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
                             }
                             Repeater {
@@ -334,23 +360,23 @@ PanelWindow {
                                     height: modes.height
                                     Row {
                                         anchors.centerIn: parent
-                                        spacing: 10
+                                        spacing: 8
                                         Row {
                                             anchors.verticalCenter: parent.verticalCenter
-                                            spacing: 3
+                                            spacing: 2
                                             Repeater {
                                                 model: 4
                                                 Rectangle {
                                                     required property int index
                                                     anchors.bottom: parent.bottom
-                                                    width: 4
-                                                    height: 6 + index * 4
-                                                    radius: 2
-                                                    color: index <= mc.index ? (mc.on ? Theme.ink : Theme.fg) : (mc.on ? Theme.mute : Theme.s3)
+                                                    width: 3
+                                                    height: 5 + index * 3
+                                                    radius: 0
+                                                    color: index <= mc.index ? (mc.on ? "#000000" : Theme.hazard) : (mc.on ? Theme.s3 : Theme.s3)
                                                 }
                                             }
                                         }
-                                        Lb { anchors.verticalCenter: parent.verticalCenter; text: Rules.modes[mc.index].short; color: mc.on ? Theme.ink : Theme.grey }
+                                        Lb { anchors.verticalCenter: parent.verticalCenter; text: Rules.modes[mc.index].short; color: mc.on ? "#000000" : Theme.chalk }
                                     }
                                     TapHandler { onTapped: { root.pin(); Rules.setMode(mc.index); } }
                                     HoverHandler { cursorShape: Qt.PointingHandCursor }
@@ -359,12 +385,13 @@ PanelWindow {
                         }
                         Rectangle {
                             id: game
-                            width: 54
-                            height: 54
-                            radius: 27
-                            color: Rules.store.game ? Theme.fg : Theme.s2
+                            width: 48
+                            height: 48
+                            radius: 0
+                            color: Rules.store.game ? Theme.accent : Theme.s2
+                            border { width: 1; color: Rules.store.game ? Theme.hazard : Theme.line }
                             Behavior on color { ColorAnimation { duration: Theme.t } }
-                            Icon { anchors.centerIn: parent; text: "\u{F0297}"; font.pixelSize: 22; color: Rules.store.game ? Theme.ink : Theme.fg }
+                            Icon { anchors.centerIn: parent; text: "\u{F0297}"; font.pixelSize: 20; color: Rules.store.game ? "#000000" : Theme.fg }
                             TapHandler { onTapped: { root.pin(); Rules.store.game = !Rules.store.game; } }
                             HoverHandler { cursorShape: Qt.PointingHandCursor }
                         }
@@ -375,13 +402,14 @@ PanelWindow {
                         visible: !!Media.player
                         width: parent.width
                         height: 86
-                        radius: Theme.corner(30)
+                        radius: 0
                         color: Theme.s2
+                        border { width: 1; color: Theme.accent }
                         Art { id: mart; x: 12; anchors.verticalCenter: parent.verticalCenter; width: 62; height: 62; step: 4; url: Media.player?.trackArtUrl ?? "" }
                         Column {
                             anchors { left: mart.right; leftMargin: 16; right: mctl.left; rightMargin: 16; verticalCenter: parent.verticalCenter }
-                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackTitle || "Nothing on"; font { family: Theme.ui; pixelSize: 16; weight: Font.DemiBold } color: Theme.fg }
-                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackArtist ?? ""; font { family: Theme.ui; pixelSize: 13 } color: Theme.grey }
+                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackTitle || "Nothing on"; font { family: Theme.mono; pixelSize: 13; weight: Font.Bold } color: Theme.fg }
+                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackArtist ?? ""; font { family: Theme.mono; pixelSize: 10 } color: Theme.grey }
                         }
                         Controls { id: mctl; anchors { right: parent.right; rightMargin: 18; verticalCenter: parent.verticalCenter } size: 20; play: 44 }
                     }
@@ -398,18 +426,20 @@ PanelWindow {
         HoverHandler { id: edge }
     }
 
-    // Circular header action button
+    // Tactical header action button
     component Round: Rectangle {
         property string icon
         signal clicked
-        width: 44
-        height: 44
-        radius: 22
+        width: 38
+        height: 38
+        radius: 0
         color: Theme.s2
-        Icon { anchors.centerIn: parent; text: parent.icon }
+        border { width: 1; color: Theme.accent }
+        Icon { anchors.centerIn: parent; text: parent.icon; color: Theme.chalk; font.pixelSize: 18 }
         TapHandler { onTapped: { root.pin(); parent.clicked(); } }
+        HoverHandler { cursorShape: Qt.PointingHandCursor }
     }
-    // Pill button: active is white with black text. Right-click opens network/device list dropdown; chevron indicates expanded state
+    // Tactical Pill button
     component Pill: Rectangle {
         id: pill
         property bool on
@@ -420,47 +450,49 @@ PanelWindow {
         property string sub
         signal clicked
         width: (col.width - 12) / 2
-        height: 76
-        radius: Theme.corner(38)
-        color: on ? Theme.fg : Theme.s2
+        height: 72
+        radius: 0
+        color: pill.on ? Theme.s3 : Theme.s2
+        border { width: 1; color: pill.on ? Theme.accent : Theme.line }
         Behavior on color { ColorAnimation { duration: Theme.t } }
         Rectangle {
             id: pi
-            x: 12
+            x: 10
             anchors.verticalCenter: parent.verticalCenter
-            width: 52
-            height: 52
-            radius: 26
-            color: pill.on ? Theme.ink : Theme.s3
-            Icon { anchors.centerIn: parent; text: pill.icon; font.pixelSize: 22 }
+            width: 44
+            height: 44
+            radius: 0
+            color: pill.on ? Theme.accent : Theme.s1
+            border { width: 1; color: pill.on ? Theme.hazard : Theme.line }
+            Icon { anchors.centerIn: parent; text: pill.icon; font.pixelSize: 20; color: pill.on ? "#000000" : Theme.fg }
         }
         Column {
             anchors { left: pi.right; leftMargin: 12; right: chev.left; rightMargin: 8; verticalCenter: parent.verticalCenter }
-            Text { text: pill.name; font { family: Theme.ui; pixelSize: 16; weight: Font.DemiBold } color: pill.on ? Theme.ink : Theme.fg }
+            Text { text: pill.name; font { family: Theme.ui; pixelSize: 15; weight: Font.Bold } color: pill.on ? Theme.fg : Theme.chalk }
             Text {
                 width: parent.width
                 elide: Text.ElideRight
                 textFormat: Text.PlainText
                 text: pill.sub
-                font { family: Theme.mono; pixelSize: 11; letterSpacing: 0.9; capitalization: Font.AllUppercase }
-                color: pill.on ? Theme.ink : Theme.fg
-                opacity: 0.6
+                font { family: Theme.mono; pixelSize: 10; letterSpacing: 0.9; capitalization: Font.AllUppercase }
+                color: pill.on ? Theme.hazard : Theme.grey
             }
         }
         Icon {
             id: chev
-            anchors { right: parent.right; rightMargin: 20; verticalCenter: parent.verticalCenter }
+            anchors { right: parent.right; rightMargin: 16; verticalCenter: parent.verticalCenter }
             text: "\u{F0140}"
-            font.pixelSize: 18
-            color: pill.on ? Theme.ink : Theme.fg
-            opacity: pill.picked ? 1 : 0.4
+            font.pixelSize: 16
+            color: pill.on ? Theme.accent : Theme.grey
+            opacity: pill.picked ? 1 : 0.6
             rotation: pill.picked ? 180 : 0
             Behavior on rotation { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
         }
         TapHandler { onTapped: { root.pin(); pill.clicked(); } }
         TapHandler { acceptedButtons: Qt.RightButton; onTapped: { root.pin(); pill.menu(); } }
+        HoverHandler { cursorShape: Qt.PointingHandCursor }
     }
-    // 68px circular tile: active state is a filled white circle. Right-click opens submenu (e.g., recording settings); active state shows white label
+    // Tactical rectangular tile: active state is filled crimson tile with corner reticles
     component Tile: Column {
         id: tile
         property bool on
@@ -470,21 +502,34 @@ PanelWindow {
         property string name
         signal clicked
         width: col.width / 4
-        spacing: 8
+        spacing: 6
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 68
-            height: 68
-            radius: 34
-            color: tile.on ? Theme.fg : Theme.s2
+            width: 66
+            height: 66
+            radius: 0
+            color: tile.on ? Theme.s3 : Theme.s2
+            border { width: tile.on ? 2 : 1; color: tile.on ? Theme.accent : Theme.line }
             Behavior on color { ColorAnimation { duration: Theme.t } }
-            Icon { anchors.centerIn: parent; text: tile.icon; font.pixelSize: 24; color: tile.on ? Theme.ink : Theme.fg }
+
+            // Tactical Corner Brackets for active tile
+            Rectangle { visible: tile.on; x: 2; y: 2; width: 5; height: 1; color: Theme.hazard }
+            Rectangle { visible: tile.on; x: 2; y: 2; width: 1; height: 5; color: Theme.hazard }
+            Rectangle { visible: tile.on; anchors.right: parent.right; anchors.rightMargin: 2; y: 2; width: 5; height: 1; color: Theme.hazard }
+            Rectangle { visible: tile.on; anchors.right: parent.right; anchors.rightMargin: 2; y: 2; width: 1; height: 5; color: Theme.hazard }
+            Rectangle { visible: tile.on; x: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 5; height: 1; color: Theme.hazard }
+            Rectangle { visible: tile.on; x: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 1; height: 5; color: Theme.hazard }
+            Rectangle { visible: tile.on; anchors.right: parent.right; anchors.rightMargin: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 5; height: 1; color: Theme.hazard }
+            Rectangle { visible: tile.on; anchors.right: parent.right; anchors.rightMargin: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 1; height: 5; color: Theme.hazard }
+
+            Icon { anchors.centerIn: parent; text: tile.icon; font.pixelSize: 22; color: tile.on ? Theme.hazard : Theme.chalk }
             TapHandler { onTapped: { root.pin(); tile.clicked(); } }
             TapHandler { acceptedButtons: Qt.RightButton; onTapped: { root.pin(); tile.menu(); } }
+            HoverHandler { cursorShape: Qt.PointingHandCursor }
         }
-        Lb { anchors.horizontalCenter: parent.horizontalCenter; text: tile.name; px: 10; color: tile.picked ? Theme.fg : Theme.grey }
+        Lb { anchors.horizontalCenter: parent.horizontalCenter; text: tile.name; px: 9; color: tile.picked || tile.on ? Theme.fg : Theme.grey }
     }
-    // Slider: filled portion is a white pill with an icon; empty portion is rendered as dotted markings
+    // Slider: tactical linear meter with filled crimson track
     component Slider: Rectangle {
         id: sl
         property real value
@@ -492,33 +537,37 @@ PanelWindow {
         signal moved(real v)
         readonly property real shown: area.pressed ? area.v : value
         width: col.width
-        height: 54
-        radius: Theme.corner(27)
+        height: 48
+        radius: 0
         color: Theme.s2
-        // Dotted scale for empty track (11px spacing). Done in QML rather than SVG tiling to avoid rasterization blur under canvas scaling
+        border { width: 1; color: Theme.line }
+
+        // Tactical scale ticks
         Row {
             x: 10
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 11 - 2.8
+            spacing: 8
             Repeater {
-                model: Math.max(0, Math.floor((sl.width - 20) / 11) + 1)
-                Rectangle { width: 2.8; height: 2.8; radius: 1.4; color: Theme.mute }
+                model: Math.max(0, Math.floor((sl.width - 20) / 12))
+                Rectangle { width: 4; height: 4; radius: 0; color: Theme.s3 }
             }
         }
         Rectangle {
             width: Math.max(height, sl.width * sl.shown)
             height: parent.height
-            radius: Theme.corner(27)
-            color: Theme.fg
-            Icon { x: 18; anchors.verticalCenter: parent.verticalCenter; text: sl.icon; font.pixelSize: 21; color: Theme.ink }
+            radius: 0
+            color: Theme.accent
+            border { width: 1; color: Theme.hazard }
+            Icon { x: 16; anchors.verticalCenter: parent.verticalCenter; text: sl.icon; font.pixelSize: 20; color: "#000000" }
         }
         Rectangle {
-            anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
-            width: val.width + 16
-            height: val.height + 8
-            radius: Theme.corner(10)
-            color: Theme.s2
-            Lb { id: val; anchors.centerIn: parent; text: Math.round(sl.shown * 100) }
+            anchors { right: parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }
+            width: val.width + 14
+            height: val.height + 6
+            radius: 0
+            color: Theme.s1
+            border { width: 1; color: Theme.line }
+            Lb { id: val; anchors.centerIn: parent; text: Math.round(sl.shown * 100) + "%"; color: Theme.chalk }
         }
         MouseArea {
             id: area

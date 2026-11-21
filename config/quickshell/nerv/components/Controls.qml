@@ -21,8 +21,9 @@ Row {
     Rectangle {
         width: root.play
         height: root.play
-        radius: root.play / 2
+        radius: 0
         color: Theme.accent
+        border { width: 1; color: Theme.hazard }
         Icon { anchors.centerIn: parent; text: Media.playing ? "\u{F03E4}" : "\u{F040A}"; color: Theme.on(Theme.accent); font.pixelSize: root.play * 0.46 }
         TapHandler { onTapped: Media.player?.togglePlaying() }
     }

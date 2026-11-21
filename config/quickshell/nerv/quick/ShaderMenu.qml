@@ -14,8 +14,9 @@ Rectangle {
     readonly property var currentItems: tab === 0 ? daily : all
 
     height: col.height + 32
-    radius: Theme.corner(30)
+    radius: 0
     color: Theme.s2
+    border { width: 1; color: Theme.accent }
 
     Column {
         id: col
@@ -35,8 +36,10 @@ Rectangle {
 
                 Lb {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "optics"
+                    text: "[ OPTICS MATRIX ]"
+                    font.family: Theme.mono
                     px: 11
+                    color: Theme.hazard
                 }
 
                 // Tab chips: Rotation (6) vs All (14)
@@ -47,14 +50,16 @@ Rectangle {
                     Rectangle {
                         width: rotLab.implicitWidth + 16
                         height: 24
-                        radius: 12
-                        color: root.tab === 0 ? Theme.fg : Theme.s1
+                        radius: 0
+                        color: root.tab === 0 ? Theme.accent : Theme.s1
+                        border { width: 1; color: root.tab === 0 ? Theme.hazard : Theme.line }
                         Lb {
                             id: rotLab
                             anchors.centerIn: parent
-                            text: "daily (6)"
+                            text: "DAILY (6)"
+                            font.family: Theme.mono
                             px: 10
-                            color: root.tab === 0 ? Theme.ink : Theme.grey
+                            color: root.tab === 0 ? Theme.on(Theme.accent) : Theme.grey
                         }
                         TapHandler { onTapped: { root.touched(); root.tab = 0; } }
                         HoverHandler { cursorShape: Qt.PointingHandCursor }
@@ -63,14 +68,16 @@ Rectangle {
                     Rectangle {
                         width: allLab.implicitWidth + 16
                         height: 24
-                        radius: 12
-                        color: root.tab === 1 ? Theme.fg : Theme.s1
+                        radius: 0
+                        color: root.tab === 1 ? Theme.accent : Theme.s1
+                        border { width: 1; color: root.tab === 1 ? Theme.hazard : Theme.line }
                         Lb {
                             id: allLab
                             anchors.centerIn: parent
-                            text: "all (14)"
+                            text: "ALL (14)"
+                            font.family: Theme.mono
                             px: 10
-                            color: root.tab === 1 ? Theme.ink : Theme.grey
+                            color: root.tab === 1 ? Theme.on(Theme.accent) : Theme.grey
                         }
                         TapHandler { onTapped: { root.touched(); root.tab = 1; } }
                         HoverHandler { cursorShape: Qt.PointingHandCursor }
@@ -83,9 +90,9 @@ Rectangle {
                 anchors { right: parent.right; verticalCenter: parent.verticalCenter }
                 width: offLab.implicitWidth + 18
                 height: 26
-                radius: 13
-                color: Sys.shader === "" ? Theme.fg : Theme.s1
-                border { width: Sys.shader === "" ? 0 : 1; color: Theme.s3 }
+                radius: 0
+                color: Sys.shader === "" ? Theme.accent : Theme.s1
+                border { width: 1; color: Sys.shader === "" ? Theme.hazard : Theme.line }
                 Row {
                     anchors.centerIn: parent
                     spacing: 5
@@ -93,14 +100,15 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "\u{F050E}"
                         font.pixelSize: 11
-                        color: Sys.shader === "" ? Theme.ink : Theme.grey
+                        color: Sys.shader === "" ? Theme.on(Theme.accent) : Theme.grey
                     }
                     Lb {
                         id: offLab
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "normal"
+                        text: "NORMAL"
+                        font.family: Theme.mono
                         px: 10
-                        color: Sys.shader === "" ? Theme.ink : Theme.fg
+                        color: Sys.shader === "" ? Theme.on(Theme.accent) : Theme.fg
                     }
                 }
                 TapHandler {
@@ -139,10 +147,22 @@ Rectangle {
                         readonly property bool active: Sys.shader === modelData.id
                         width: (grid.width - 8) / 2
                         height: 42
-                        radius: Theme.corner(21)
-                        color: active ? Theme.fg : cardHov.hovered ? Theme.s3 : Theme.s1
-                        border { width: active ? 0 : 1; color: Theme.s3 }
+                        radius: 0
+                        color: active ? Theme.accent : cardHov.hovered ? Theme.s3 : Theme.s1
+                        border { width: 1; color: active ? Theme.hazard : Theme.line }
                         Behavior on color { ColorAnimation { duration: Theme.t } }
+
+                        // Tactical corner reticles for active card
+                        Rectangle {
+                            visible: card.active
+                            width: 3; height: 3; color: Theme.hazard
+                            anchors { left: parent.left; top: parent.top }
+                        }
+                        Rectangle {
+                            visible: card.active
+                            width: 3; height: 3; color: Theme.hazard
+                            anchors { right: parent.right; bottom: parent.bottom }
+                        }
 
                         Row {
                             anchors { left: parent.left; leftMargin: 12; right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
@@ -152,7 +172,7 @@ Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "\u{F03D8}"
                                 font.pixelSize: 13
-                                color: card.active ? Theme.ink : Theme.grey
+                                color: card.active ? Theme.on(Theme.accent) : Theme.grey
                             }
 
                             Column {
@@ -165,17 +185,18 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     elide: Text.ElideRight
                                     width: parent.width
-                                    font { family: Theme.ui; pixelSize: 12; weight: Font.DemiBold }
-                                    color: card.active ? Theme.ink : Theme.fg
+                                    font { family: Theme.mono; pixelSize: 11; bold: true }
+                                    color: card.active ? Theme.on(Theme.accent) : Theme.fg
                                 }
 
                                 Lb {
                                     text: card.modelData.desc
                                     elide: Text.ElideRight
                                     width: parent.width
+                                    font.family: Theme.mono
                                     px: 9
-                                    color: card.active ? Theme.ink : Theme.grey
-                                    opacity: card.active ? 0.7 : 1
+                                    color: card.active ? Theme.on(Theme.accent) : Theme.grey
+                                    opacity: card.active ? 0.75 : 1
                                 }
                             }
                         }

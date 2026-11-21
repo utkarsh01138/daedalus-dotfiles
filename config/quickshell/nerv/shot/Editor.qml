@@ -13,7 +13,7 @@ Scope {
     readonly property var tools: ["pen", "arrow", "rect", "blur", "text"]
     readonly property var hotkeys: [Qt.Key_P, Qt.Key_A, Qt.Key_R, Qt.Key_B, Qt.Key_T]
     // чернила запекаются в файл — от темы не зависят. Красный здесь — содержимое снимка, не интерфейс
-    readonly property var inks: [Theme.nothingRed, "#FFFFFF", "#000000", "#8C8C8C"]
+    readonly property var inks: [Theme.crimson, "#FFFFFF", "#000000", "#8C8C8C"]
     readonly property var sizes: [3, 6, 12] // толщина в логических пикселях; в снимке — × dpr
 
     property string shot: ""

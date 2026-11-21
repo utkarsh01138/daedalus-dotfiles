@@ -12,8 +12,9 @@ Rectangle {
     readonly property var st: Theme.state
 
     height: list.height + 32
-    radius: Theme.corner(30)
+    radius: 0
     color: Theme.s2
+    border { width: 1; color: Theme.accent }
 
     Column {
         id: list
@@ -30,24 +31,25 @@ Rectangle {
         Choice { label: "quality"; opts: ["med", "high", "max", "ultra"]; cur: root.st.recQuality; onPicked: i => root.st.recQuality = i }
         Choice { label: "cursor"; opts: ["on", "off"]; cur: root.st.recCursor ? 0 : 1; onPicked: i => root.st.recCursor = i === 0 }
 
-        // старт/стоп; идёт запись — красная точка, единственное красное на панели
+        // старт/стоп
         Rectangle {
             width: list.width
-            height: 54
-            radius: Theme.corner(27)
-            color: Theme.fg
+            height: 48
+            radius: 0
+            color: Theme.accent
+            border { width: 1; color: Theme.hazard }
             Row {
                 anchors.centerIn: parent
                 spacing: 10
-                Rectangle { visible: Sys.rec; anchors.verticalCenter: parent.verticalCenter; width: 10; height: 10; radius: 5; color: Theme.accent }
-                Lb { anchors.verticalCenter: parent.verticalCenter; text: Sys.rec ? "stop recording" : "start recording"; color: Theme.ink }
+                Rectangle { visible: Sys.rec; anchors.verticalCenter: parent.verticalCenter; width: 10; height: 10; radius: 0; color: "#000000" }
+                Lb { anchors.verticalCenter: parent.verticalCenter; text: Sys.rec ? "STOP RECORDING" : "START RECORDING"; color: "#000000" }
             }
             TapHandler { onTapped: root.start() }
             HoverHandler { cursorShape: Qt.PointingHandCursor }
         }
     }
 
-    // ряд выбора: метка слева, белая заливка переезжает к выбранной клетке — как режим питания
+    // ряд выбора: метка слева
     component Choice: Item {
         id: ch
         property string label
@@ -55,23 +57,25 @@ Rectangle {
         property int cur
         signal picked(int i)
         width: list.width
-        height: 44
+        height: 40
         Lb { x: 4; anchors.verticalCenter: parent.verticalCenter; text: ch.label; px: 10 }
         Rectangle {
             id: track
             x: 96
             width: parent.width - x
             height: parent.height
-            radius: height / 2
+            radius: 0
             color: Theme.s1
+            border { width: 1; color: Theme.line }
             readonly property real cell: (width - 8) / ch.opts.length
             Rectangle {
                 x: 4 + track.cell * ch.cur
                 y: 4
                 width: track.cell
                 height: parent.height - 8
-                radius: height / 2
-                color: Theme.fg
+                radius: 0
+                color: Theme.accent
+                border { width: 1; color: Theme.hazard }
                 Behavior on x { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
             }
             Repeater {
@@ -83,7 +87,7 @@ Rectangle {
                     x: 4 + track.cell * index
                     width: track.cell
                     height: track.height
-                    Lb { anchors.centerIn: parent; px: 10; text: cell.modelData; color: ch.cur === cell.index ? Theme.ink : Theme.grey }
+                    Lb { anchors.centerIn: parent; px: 10; text: cell.modelData; color: ch.cur === cell.index ? "#000000" : Theme.chalk }
                     TapHandler { onTapped: { root.touched(); ch.picked(cell.index); } }
                     HoverHandler { cursorShape: Qt.PointingHandCursor }
                 }

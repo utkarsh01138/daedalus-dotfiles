@@ -23,7 +23,7 @@ Grid {
             readonly property int k: root.vertical ? root.n - 1 - index : index
             width: root.vertical ? root.width : (root.width - (root.n - 1) * root.spacing) / root.n
             height: root.vertical ? (root.height - (root.n - 1) * root.spacing) / root.n : root.height
-            radius: Math.min(width, height) / 2
+            radius: 0
             color: k < root.lit ? root.on : root.off
         }
     }

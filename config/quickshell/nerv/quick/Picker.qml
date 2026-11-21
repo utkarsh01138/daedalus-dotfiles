@@ -59,8 +59,9 @@ Rectangle {
 
     visible: kind === "wifi" || kind === "bt"
     height: list.height + 32
-    radius: Theme.corner(30)
+    radius: 0
     color: Theme.s2
+    border { width: 1; color: Theme.accent }
 
     Column {
         id: list
@@ -101,8 +102,9 @@ Rectangle {
                 readonly property bool busy: root.isWifi ? o.stateChanging : o.pairing || o.state === BluetoothDeviceState.Connecting || o.state === BluetoothDeviceState.Disconnecting
                 width: list.width
                 height: 56
-                radius: Theme.corner(28)
+                radius: 0
                 color: hov.hovered ? Theme.s3 : "transparent"
+                border { width: row.on ? 1 : 0; color: Theme.accent }
 
                 Rectangle {
                     id: ic
@@ -110,8 +112,9 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     width: 44
                     height: 44
-                    radius: 22
+                    radius: 0
                     color: row.on ? Theme.fg : Theme.s3
+                    border { width: 1; color: row.on ? Theme.hazard : Theme.line }
                     Icon {
                         anchors.centerIn: parent
                         text: root.isWifi ? root.bars(row.o) : root.btIcon(row.o.icon)
@@ -158,9 +161,9 @@ Rectangle {
             visible: !!root.ask
             width: list.width
             height: 56
-            radius: Theme.corner(28)
+            radius: 0
             color: Theme.s1
-            border { width: 1; color: Theme.s3 }
+            border { width: 1; color: Theme.accent }
             onVisibleChanged: if (visible) pw.forceActiveFocus()
             TextInput {
                 id: pw
@@ -181,8 +184,9 @@ Rectangle {
                 anchors { right: parent.right; rightMargin: 6; verticalCenter: parent.verticalCenter }
                 width: 44
                 height: 44
-                radius: 22
+                radius: 0
                 color: pw.text ? Theme.fg : Theme.s3
+                border { width: 1; color: pw.text ? Theme.hazard : Theme.line }
                 Icon { anchors.centerIn: parent; text: "\u{F0054}"; font.pixelSize: 19; color: pw.text ? Theme.ink : Theme.grey }
                 TapHandler { onTapped: if (pw.text) go.send() }
             }

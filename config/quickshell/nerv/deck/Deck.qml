@@ -102,17 +102,40 @@ Scope {
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 14 - (1 - win.t) * (height + 28)
                     width: row.width + 52
-                    height: root.h + 52
+                    height: root.h + 52 + 28
                     opacity: win.t // Uses opacity rather than visible so child Row maintains computed width
                     radius: 0
                     color: Theme.s1
                     border { width: 1; color: Theme.accent }
                     MouseArea { anchors.fill: parent } // Absorb clicks so panel clicks do not dismiss the deck
 
+                    // Tactical diagnostic header banner
+                    Rectangle {
+                        id: deckBanner
+                        anchors { top: parent.top; left: parent.left; right: parent.right }
+                        height: 24
+                        color: Theme.s2
+                        border { width: 1; color: Theme.accent }
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 8
+                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.crimson }
+                            Text {
+                                text: "[ NERV TACTICAL DIAGNOSTIC DECK // SYSTEM TELEMETRY // MAGI-01 ]"
+                                font.family: Theme.mono
+                                font.pixelSize: 10
+                                font.bold: true
+                                font.letterSpacing: 1.2
+                                color: Theme.hazard
+                            }
+                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.crimson }
+                        }
+                    }
+
                     Row {
                         id: row
                         x: 26
-                        y: 26
+                        y: deckBanner.height + 20
                         spacing: 16
                         Repeater {
                             model: root.ids
@@ -256,8 +279,8 @@ Scope {
                                         readonly property int lvl: Math.round(1 + 7 * (SysStats.cores[index % cores.n] ?? 0))
                                         width: cores.d
                                         height: cores.d
-                                        radius: cores.d / 2
-                                        color: up === lvl ? Theme.fg : up < lvl ? Theme.grey : Theme.s2
+                                        radius: 0
+                                        color: up === lvl ? Theme.hazard : up < lvl ? Theme.crimson : Theme.s2
                                     }
                                 }
                             }
@@ -295,8 +318,8 @@ Scope {
                                 readonly property bool lit: (tx ? r - 4 : 5 - r) <= Math.ceil(5 * (tx ? p[1] : p[0]) / hist.peak)
                                 width: hist.d
                                 height: hist.d
-                                radius: hist.d / 2
-                                color: lit ? (tx ? Theme.grey : Theme.fg) : Theme.s2
+                                radius: 0
+                                color: lit ? (tx ? Theme.hazard : Theme.crimson) : Theme.s2
                             }
                         }
                     }
@@ -319,6 +342,11 @@ Scope {
                             property real turn: 0
                             Timer { running: win.open && Media.playing; interval: 33; repeat: true; onTriggered: art.turn = (art.turn + 360 / 14 / 30) % 360 }
                             Art { anchors.fill: parent; rotation: art.turn; url: Media.player?.trackArtUrl ?? ""; step: 5 }
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "transparent"
+                                border { width: 1; color: Theme.accent }
+                            }
                         }
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
@@ -330,10 +358,10 @@ Scope {
                                 elide: Text.ElideRight
                                 text: Media.player?.trackTitle || "Nothing on"
                                 textFormat: Text.PlainText
-                                font { family: Theme.ui; pixelSize: 17; weight: Font.DemiBold }
-                                color: Theme.fg
+                                font { family: Theme.mono; pixelSize: 14; bold: true }
+                                color: Theme.hazard
                             }
-                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackArtist ?? ""; font { family: Theme.ui; pixelSize: 13 } color: Theme.grey }
+                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackArtist ?? ""; font { family: Theme.mono; pixelSize: 11 } color: Theme.grey }
                         }
                     }
                     Item { width: 1; height: 16 }

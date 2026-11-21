@@ -22,7 +22,7 @@ Item {
             y: root.height / 2 * (1 + Math.sin(a)) - height / 2
             width: root.dot
             height: root.dot
-            radius: root.dot / 2
+            radius: 0
             color: index < root.lit ? root.on : root.off
             Behavior on color { SequentialAnimation { PauseAnimation { duration: index * 8 } ColorAnimation { duration: 120 } } }
         }

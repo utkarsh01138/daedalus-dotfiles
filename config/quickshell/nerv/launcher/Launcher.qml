@@ -282,41 +282,54 @@ PanelWindow {
                     spacing: 12
                     Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
                     Text {
-                        text: "[ RESTRICTED // NERV INTERNAL ACCESS ONLY // MAGI-01 ]"
+                        text: "[ RESTRICTED // NERV INTERNAL DISPATCH // MAGI-01 ]"
                         font.family: Theme.mono
                         font.pixelSize: 11
                         font.bold: true
                         font.letterSpacing: 1.5
-                        color: Theme.amber
+                        color: Theme.hazard
                     }
                     Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
                 }
             }
 
-            // Search input: rectangular container with chamfered border and block caret
+            // Search input: rectangular container with tactical prompt and block caret
             Rectangle {
                 id: search
                 x: 34
                 y: banner.height + 20
                 width: parent.width - 68
-                height: 60
+                height: 56
                 radius: 0
                 color: Theme.s2
-                border { width: 1; color: Theme.amber }
+                border { width: 1; color: Theme.accent }
 
-                Icon { id: lens; x: 20; anchors.verticalCenter: parent.verticalCenter; text: "\u{F0349}"; color: Theme.amber; font.pixelSize: 20 }
+                Row {
+                    id: lens
+                    x: 16
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 6
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: Theme.accent }
+                    Text {
+                        text: "EXEC >"
+                        font.family: Theme.mono
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.accent
+                    }
+                }
                 TextInput {
                     id: input
-                    anchors { left: lens.right; leftMargin: 16; right: chips.left; rightMargin: 12; verticalCenter: parent.verticalCenter }
-                    font { family: Theme.mono; pixelSize: 18 }
+                    anchors { left: lens.right; leftMargin: 14; right: chips.left; rightMargin: 12; verticalCenter: parent.verticalCenter }
+                    font { family: Theme.mono; pixelSize: 16 }
                     color: Theme.chalk
-                    selectionColor: Theme.amber
+                    selectionColor: Theme.accent
                     clip: true
                     cursorDelegate: Rectangle {
-                        width: 10
-                        height: 20
-                        color: Theme.amber
-                        Timer { running: input.activeFocus; interval: 400; repeat: true; onTriggered: parent.opacity = 1 - parent.opacity }
+                        width: 8
+                        height: 18
+                        color: Theme.accent
+                        Timer { running: input.activeFocus; interval: 350; repeat: true; onTriggered: parent.opacity = 1 - parent.opacity }
                     }
                     Text {
                         visible: !input.text
@@ -341,19 +354,19 @@ PanelWindow {
                 }
                 Row {
                     id: chips
-                    anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
+                    anchors { right: parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }
                     spacing: 6
                     Repeater {
                         model: root.modes
                         Rectangle {
                             required property string modelData
                             required property int index
-                            width: chip.width + 24
-                            height: chip.height + 14
+                            width: chip.width + 20
+                            height: chip.height + 12
                             radius: 0
-                            color: root.mode === index ? Theme.accent : "transparent"
-                            border { width: root.mode === index ? 0 : 1; color: Theme.line }
-                            Lb { id: chip; anchors.centerIn: parent; text: parent.modelData.toUpperCase(); px: 10; color: root.mode === parent.index ? Theme.bg : Theme.grey }
+                            color: root.mode === index ? Theme.accent : Theme.s1
+                            border { width: 1; color: root.mode === index ? Theme.hazard : Theme.line }
+                            Lb { id: chip; anchors.centerIn: parent; text: parent.modelData.toUpperCase(); px: 9; color: root.mode === parent.index ? "#000000" : Theme.chalk }
                             TapHandler { onTapped: { root.mode = parent.index; input.forceActiveFocus(); } }
                         }
                     }
@@ -437,6 +450,41 @@ PanelWindow {
                     }
                 }
             }
+
+            // Bottom tactical status footer
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 24
+                color: Theme.s2
+                border { width: 1; color: Theme.line }
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 16
+                    Text {
+                        text: "[ ENTER: EXECUTE ]"
+                        font.family: Theme.mono
+                        font.pixelSize: 9
+                        font.bold: true
+                        color: Theme.hazard
+                    }
+                    Text {
+                        text: "[ TAB: SWITCH MODE ]"
+                        font.family: Theme.mono
+                        font.pixelSize: 9
+                        font.bold: true
+                        color: Theme.grey
+                    }
+                    Text {
+                        text: "[ ESC: ABORT ]"
+                        font.family: Theme.mono
+                        font.pixelSize: 9
+                        font.bold: true
+                        color: Theme.mute
+                    }
+                }
+            }
         }
     }
 
@@ -483,6 +531,17 @@ PanelWindow {
             radius: 0
             color: cell.modelData.fill ?? (cell.on ? Theme.s3 : Theme.s2)
             border { width: cell.on ? 2 : 1; color: cell.on ? Theme.accent : Theme.line }
+
+            // Tactical Corner Reticles for selected cell
+            Rectangle { visible: cell.on; x: 2; y: 2; width: 6; height: 1; color: Theme.hazard }
+            Rectangle { visible: cell.on; x: 2; y: 2; width: 1; height: 6; color: Theme.hazard }
+            Rectangle { visible: cell.on; anchors.right: parent.right; anchors.rightMargin: 2; y: 2; width: 6; height: 1; color: Theme.hazard }
+            Rectangle { visible: cell.on; anchors.right: parent.right; anchors.rightMargin: 2; y: 2; width: 1; height: 6; color: Theme.hazard }
+            Rectangle { visible: cell.on; x: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 6; height: 1; color: Theme.hazard }
+            Rectangle { visible: cell.on; x: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 1; height: 6; color: Theme.hazard }
+            Rectangle { visible: cell.on; anchors.right: parent.right; anchors.rightMargin: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 6; height: 1; color: Theme.hazard }
+            Rectangle { visible: cell.on; anchors.right: parent.right; anchors.rightMargin: 2; anchors.bottom: parent.bottom; anchors.bottomMargin: 2; width: 1; height: 6; color: Theme.hazard }
+
             // Swatch highlight rectangle around selected item
             Rectangle { visible: cell.on && !!cell.modelData.fill; anchors.centerIn: parent; width: 100; height: 100; radius: 0; color: "transparent"; border { width: 2; color: Theme.accent } }
             Rectangle { id: inner; visible: !!cell.modelData.dot; anchors.centerIn: parent; width: 40; height: 40; radius: 0; color: cell.modelData.dot ?? "transparent" }
@@ -514,7 +573,7 @@ PanelWindow {
                 const e = c === "<" ? "&lt;" : c === "&" ? "&amp;" : c;
                 return hl.includes(i) ? `<font color="${Theme.fg}">${e}</font>` : e;
             }).join("")
-            font { family: Theme.ui; pixelSize: 14 }
+            font { family: Theme.mono; pixelSize: 11; bold: true }
             color: cell.on ? Theme.fg : Theme.grey
         }
     }

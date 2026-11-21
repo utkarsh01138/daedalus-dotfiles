@@ -107,8 +107,8 @@ Singleton {
         const k = Object.assign({ paint: st.paint, scheme: st.scheme, at: st.paintAt, variant: st.variant, light: st.light }, o);
         if (k.paint === "scheme") return Schemes.ALL.find(p => p.id === k.scheme) ?? Schemes.ALL[0];
         // 16 ANSI colors for NERV: Blood Crimson, Dark Red, Muted Violet, White
-        const nervAnsi = ["#121216", "#E51D24", "#FF3B43", "#FF8C00", "#00E5FF", "#B00010", "#9B111E", "#EAEAEB",
-                          "#26262E", "#FF5259", "#FF6B6B", "#FFA52E", "#38E1FF", "#D90429", "#BA181B", "#FFFFFF"];
+        const nervAnsi = ["#121216", "#E51D24", "#FF3B43", "#D90429", "#00E5FF", "#B00010", "#9B111E", "#EAEAEB",
+                          "#26262E", "#FF5259", "#FF6B6B", "#FF3B43", "#38E1FF", "#D90429", "#BA181B", "#FFFFFF"];
         const base = { light: k.light, c: k.light ? nervLight : nervDark, accent: k.light ? "#CC1824" : "#E51D24", red: "#E51D24",
                        ansi: k.light ? [15, 1, 2, 3, 4, 5, 6, 8, 7, 9, 10, 11, 12, 13, 14, 0].map(i => nervAnsi[i]) : nervAnsi };
         const src = tones[Math.min(k.at, tones.length - 1)];
