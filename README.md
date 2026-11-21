@@ -111,13 +111,13 @@ sudo pacman -Syu --needed base-devel git curl jq python \
 ### Deploying the Dotfiles
 ```bash
 # Clone the Daedalus Dotfiles repository
-git clone https://github.com/utkarsh01138/daedalus-dotfiles ~/.local/share/glyph
+git clone https://github.com/utkarsh01138/daedalus-dotfiles ~/daedalus
 
 # Apply symlinks to ~/.config/ and ~/.local/bin/
-~/.local/share/glyph/install.sh --links
+~/daedalus/install.sh --links
 
 # (Optional) Full automated install including SDDM greeter:
-# ~/.local/share/glyph/install.sh
+# ~/daedalus/install.sh
 ```
 
 ---
