@@ -70,9 +70,10 @@ Direct single-pass GLSL ES 3.0 fragment shader injection into Hyprland's composi
 * Auto-adapting layout: When no notifications are active, the panel cleanly collapses to start with the Clock.
 
 ### 🔄 6. Multi-Rice Architecture (`rice switch`)
-Built-in desktop profile switching engine (`~/daedalus/config/quickshell/rice/rice`) supporting atomic hot-swapping between **5 operational desktop profiles** with zero muscle-memory friction:
+Built-in desktop profile switching engine (`~/.local/bin/rice`) supporting atomic hot-swapping between operational desktop profiles with zero muscle-memory friction:
 * **`glyph` (NothingOS):** Clean dot-matrix minimalism & Android companion widgets (Daily Driver).
-* **`nerv` (NERV Tactical Command):** Militaristic bunker HUD & MAGI consensus tri-cluster (`MELCHIOR-1`, `BALTHASAR-2`, `CASPAR-3`) with razor 0px window edges, segmented step-meter battery telemetry, and Electric Amber & Unit-02 Crimson accents.
+* **`nerv` (NERV Tactical Command):** Militaristic bunker HUD with razor 0px window edges, pure Evangelion Blood Crimson (`#E51D24`) and Neon Red (`#FF3B43`) colorway, flush edge-to-edge command rail, hardware-linked MAGI tri-cluster telemetry (`MELCHIOR-1`, `BALTHASAR-2`, `CASPAR-3`), pulsing vector AT-Field in LARP mode, dynamic Eva-01 synchronicity tracking, and adaptive wallpaper contrast.
+* **`eva95` (NERV Central Dogma 1995 CRT):** Faithful 1995 *Neon Genesis Evangelion* supercomputer aesthetic. Fully decoupled from `nerv` with independent state (`eva95.json`), layershell namespaces, and terminal themes; tailored for retro amber CRT phosphor (`#FF8800`), iconic tripartite hexagonal MAGI displays, and emergency hazard chevrons.
 * **`glass` (Liquid Acrylic):** Floating translucent frosted glass with specular refraction and dual-kawase blur (Creative Studio).
 * **`astro` (Deep Space):** Pure pitch `#000000` OLED black, stellar spectral classes (O-B-A-F-G-K-M), and moon phase HUD (Nocturnal Observatory).
 * **`fjord` (Nordic Sanctuary):** Soothing glacial blues and soft polar night slate for low-cognitive-load focus and eye recovery.
