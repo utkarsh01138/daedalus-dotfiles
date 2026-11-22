@@ -1,0 +1,33 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "auto",
+        "source": "~/.config/fastfetch/nerv_logo.png",
+        "width": 26,
+        "height": 13,
+        "padding": { "top": 1, "left": 2, "right": 4 }
+    },
+    "display": {
+        "separator": " : ",
+        "color": { "keys": "31", "title": "31", "output": "97", "separator": "90" },
+        "percent": { "color": { "green": "31", "yellow": "31", "red": "91" } }
+    },
+    "modules": [
+        "break",
+        { "type": "custom", "format": "\u001b[1;31m[ NERV CENTRAL DOGMA // MAGI SUPERCOMPUTER // EVA-95 ]\u001b[0m" },
+        { "type": "custom", "format": "\u001b[37m\"GOD'S IN HIS HEAVEN. ALL'S RIGHT WITH THE WORLD.\"\u001b[0m" },
+        { "type": "separator", "string": "─", "outputColor": "31" },
+        { "type": "title", "color": { "user": "1;31", "at": "90", "host": "1;37" } },
+        { "type": "os", "key": "[ OS ]      " },
+        { "type": "kernel", "key": "[ KERNEL ]  ", "format": "{release}" },
+        { "type": "wm", "key": "[ WM ]      ", "format": "{pretty-name}" },
+        { "type": "command", "key": "[ MAGI ]    ", "text": "echo 'MELCHIOR-1 [OK] | BALTHASAR-2 [OK] | CASPAR-3 [OK]'" },
+        { "type": "terminal", "key": "[ TERM ]    ", "format": "{pretty-name}" },
+        { "type": "terminalfont", "key": "[ FONT ]    " },
+        { "type": "uptime", "key": "[ UPTIME ]  " },
+        { "type": "memory", "key": "[ MEMORY ]  " },
+        "break",
+        { "type": "colors", "symbol": "square" },
+        "break"
+    ]
+}
