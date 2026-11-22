@@ -209,30 +209,107 @@ PanelWindow {
             }
         }
 
+        // LARP: Authentic Evangelion AT-Field (Absolute Terror Field)
+        Item {
+            id: atField
+            visible: root.larp
+            anchors.centerIn: parent
+            width: 500
+            height: 500
+
+            // Radiating Phase Wave 1
+            Image {
+                anchors.centerIn: parent
+                width: 480
+                height: 480
+                sourceSize: Qt.size(width, height)
+                source: Qt.resolvedUrl("atfield_pulse.svg")
+                NumberAnimation on scale {
+                    running: root.larp
+                    from: 0.6
+                    to: 1.5
+                    duration: 2200
+                    loops: Animation.Infinite
+                }
+                NumberAnimation on opacity {
+                    running: root.larp
+                    from: 0.9
+                    to: 0.0
+                    duration: 2200
+                    loops: Animation.Infinite
+                }
+            }
+
+            // Radiating Phase Wave 2 (offset)
+            Image {
+                anchors.centerIn: parent
+                width: 480
+                height: 480
+                sourceSize: Qt.size(width, height)
+                source: Qt.resolvedUrl("atfield_pulse.svg")
+                SequentialAnimation {
+                    running: root.larp
+                    loops: Animation.Infinite
+                    PauseAnimation { duration: 1100 }
+                    ParallelAnimation {
+                        NumberAnimation { property: "scale"; from: 0.6; to: 1.5; duration: 2200 }
+                        NumberAnimation { property: "opacity"; from: 0.9; to: 0.0; duration: 2200 }
+                    }
+                }
+            }
+
+            // Core Concentric Octagons
+            Image {
+                anchors.centerIn: parent
+                width: 380
+                height: 380
+                sourceSize: Qt.size(width, height)
+                source: Qt.resolvedUrl("atfield.svg")
+                opacity: 0.85
+                SequentialAnimation on scale {
+                    running: root.larp
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 0.96; to: 1.04; duration: 1400; easing.type: Easing.InOutQuad }
+                    NumberAnimation { from: 1.04; to: 0.96; duration: 1400; easing.type: Easing.InOutQuad }
+                }
+            }
+            Image {
+                anchors.centerIn: parent
+                width: 260
+                height: 260
+                sourceSize: Qt.size(width, height)
+                source: Qt.resolvedUrl("atfield.svg")
+                opacity: 0.95
+                SequentialAnimation on scale {
+                    running: root.larp
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 1.03; to: 0.97; duration: 1100; easing.type: Easing.InOutQuad }
+                    NumberAnimation { from: 0.97; to: 1.03; duration: 1100; easing.type: Easing.InOutQuad }
+                }
+            }
+
+            // Center Phase Status Label
+            Rectangle {
+                anchors.centerIn: parent
+                width: 260
+                height: 20
+                radius: 0
+                color: Qt.rgba(0.05, 0.05, 0.08, 0.85)
+                border { width: 1; color: Theme.hazard }
+                Text {
+                    anchors.centerIn: parent
+                    text: "AT-FIELD // PHASE: 432.8 THz [ACTIVE]"
+                    font { family: Theme.mono; pixelSize: 9; bold: true; letterSpacing: 1.1 }
+                    color: Theme.hazard
+                }
+            }
+        }
+
         // Center Target Lock Ring Framing
         Item {
             anchors.centerIn: parent
             width: 380
             height: 380
-
-            // LARP: Pulsing AT-Field Hexagonal Barrier
-            Rectangle {
-                visible: root.larp
-                anchors.centerIn: parent
-                width: 140
-                height: 140
-                radius: 0
-                rotation: 45
-                color: "transparent"
-                border { width: 2; color: Theme.hazard }
-                opacity: 0.5
-                SequentialAnimation on scale {
-                    running: root.larp
-                    loops: Animation.Infinite
-                    NumberAnimation { from: 0.9; to: 1.15; duration: 1800; easing.type: Easing.InOutQuad }
-                    NumberAnimation { from: 1.15; to: 0.9; duration: 1800; easing.type: Easing.InOutQuad }
-                }
-            }
 
             // LARP: Sweeping Radar Beam
             Item {

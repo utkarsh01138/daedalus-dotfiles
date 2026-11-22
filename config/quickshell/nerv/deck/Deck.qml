@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Networking
+import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs
 import qs.components
@@ -383,53 +385,144 @@ Scope {
             Component {
                 id: magiC
                 Column {
-                    width: 220
-                    Lb { width: parent.width; text: "magi · consensus 3/3"; px: 11; font.bold: true; color: Theme.hazard }
+                    id: magiCol
+                    width: 236
+
+                    // Live hardware-linked decisions for the 3 MAGI nodes:
+                    // MELCHIOR-1 (Scientist): Kernel, CPU thread load and thermal headroom
+                    readonly property bool mAgree: SysStats.cpu < 0.85 && SysStats.cpuTemp < 82
+                    readonly property string mSub: `CPU ${Math.round(SysStats.cpu * 100)}% · ${Math.round(SysStats.cpuTemp)}°C`
+                    readonly property string mVote: mAgree ? "[ NOMINAL ]" : "[ OVERLOAD ]"
+
+                    // BALTHASAR-2 (Mother): System preservation, Memory buffer, and Battery/AC umbilical
+                    readonly property bool bAgree: SysStats.mem < 0.90 && (!UPower.displayDevice?.present || (UPower.displayDevice?.percentage ?? 100) > 15 || UPower.displayDevice?.state === 1)
+                    readonly property string bSub: `MEM ${SysStats.memUsed.toFixed(1)}G · ${UPower.displayDevice?.present ? Math.round(UPower.displayDevice.percentage) + "%" : "AC"}`
+                    readonly property string bVote: bAgree ? "[ PROTECT ]" : "[ CRITICAL ]"
+
+                    // CASPAR-3 (Woman): Communication bus, active network link, and data throughput
+                    readonly property bool cAgree: (SysStats.rx + SysStats.tx > 50) || Networking.connectivity === NetworkConnectivity.Full || (SysStats.iface && SysStats.iface !== "")
+                    readonly property string cSub: `${SysStats.iface || "OFFLINE"} · ↓${Math.round(SysStats.rx / 1024)}K ↑${Math.round(SysStats.tx / 1024)}K`
+                    readonly property string cVote: cAgree ? "[ LINK OK ]" : "[ SEVERED ]"
+
+                    // Tri-Cluster Consensus Count
+                    readonly property int consensus: (mAgree ? 1 : 0) + (bAgree ? 1 : 0) + (cAgree ? 1 : 0)
+
+                    // Eva-01 Synchronicity Ratio: dynamically modulated by CPU frequency and load
+                    readonly property real synchVal: Math.min(0.999, Math.max(0.680, 0.85 + (SysStats.cpuFreq / 4.4) * 0.10 - SysStats.cpu * 0.08))
+
+                    Lb {
+                        width: parent.width
+                        text: `magi · consensus ${magiCol.consensus}/3`
+                        px: 11
+                        font.bold: true
+                        color: magiCol.consensus === 3 ? Theme.hazard : magiCol.consensus === 2 ? Theme.crimson : Theme.red
+                    }
                     Item { width: 1; height: 8 }
 
                     // Tri-Cluster voting cards
                     Column {
                         width: parent.width
                         spacing: 4
-                        Repeater {
-                            model: [
-                                { name: "MELCHIOR-1", role: "SCIENTIST", code: "CODE 474", vote: "AFFIRMATIVE" },
-                                { name: "BALTHASAR-2", role: "MOTHER", code: "CODE 474", vote: "AFFIRMATIVE" },
-                                { name: "CASPAR-3", role: "WOMAN", code: "CODE 474", vote: "AFFIRMATIVE" }
-                            ]
-                            Rectangle {
-                                required property var modelData
-                                width: parent.width
-                                height: 32
-                                radius: 0
-                                color: Theme.s2
-                                border { width: 1; color: Theme.line }
 
-                                Row {
-                                    anchors { left: parent.left; leftMargin: 8; right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
-                                    spacing: 6
-                                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: Theme.accent }
-                                    Column {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        Text {
-                                            text: parent.parent.parent.modelData.name
-                                            font { family: Theme.mono; pixelSize: 10; bold: true }
-                                            color: Theme.hazard
-                                        }
-                                        Text {
-                                            text: parent.parent.parent.modelData.role + " // " + parent.parent.parent.modelData.code
-                                            font { family: Theme.mono; pixelSize: 8 }
-                                            color: Theme.mute
-                                        }
-                                    }
-                                    Item { width: 1; height: 1 }
+                        // Melchior-1 (Scientist)
+                        Rectangle {
+                            width: parent.width
+                            height: 32
+                            radius: 0
+                            color: Theme.s2
+                            border { width: 1; color: magiCol.mAgree ? Theme.line : Theme.crimson }
+
+                            Row {
+                                anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
+                                spacing: 6
+                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.mAgree ? Theme.accent : Theme.red }
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
                                     Text {
-                                        anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                                        text: "[ AGREE ]"
+                                        text: "MELCHIOR-1 // SCIENTIST"
                                         font { family: Theme.mono; pixelSize: 9; bold: true }
-                                        color: Theme.crimson
+                                        color: magiCol.mAgree ? Theme.hazard : Theme.red
+                                    }
+                                    Text {
+                                        text: magiCol.mSub
+                                        font { family: Theme.mono; pixelSize: 8 }
+                                        color: Theme.mute
                                     }
                                 }
+                            }
+                            Text {
+                                anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
+                                text: magiCol.mVote
+                                font { family: Theme.mono; pixelSize: 9; bold: true }
+                                color: magiCol.mAgree ? Theme.hazard : Theme.red
+                            }
+                        }
+
+                        // Balthasar-2 (Mother)
+                        Rectangle {
+                            width: parent.width
+                            height: 32
+                            radius: 0
+                            color: Theme.s2
+                            border { width: 1; color: magiCol.bAgree ? Theme.line : Theme.crimson }
+
+                            Row {
+                                anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
+                                spacing: 6
+                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.bAgree ? Theme.accent : Theme.red }
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    Text {
+                                        text: "BALTHASAR-2 // MOTHER"
+                                        font { family: Theme.mono; pixelSize: 9; bold: true }
+                                        color: magiCol.bAgree ? Theme.hazard : Theme.red
+                                    }
+                                    Text {
+                                        text: magiCol.bSub
+                                        font { family: Theme.mono; pixelSize: 8 }
+                                        color: Theme.mute
+                                    }
+                                }
+                            }
+                            Text {
+                                anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
+                                text: magiCol.bVote
+                                font { family: Theme.mono; pixelSize: 9; bold: true }
+                                color: magiCol.bAgree ? Theme.hazard : Theme.red
+                            }
+                        }
+
+                        // Caspar-3 (Woman)
+                        Rectangle {
+                            width: parent.width
+                            height: 32
+                            radius: 0
+                            color: Theme.s2
+                            border { width: 1; color: magiCol.cAgree ? Theme.line : Theme.crimson }
+
+                            Row {
+                                anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
+                                spacing: 6
+                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.cAgree ? Theme.accent : Theme.red }
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    Text {
+                                        text: "CASPAR-3 // WOMAN"
+                                        font { family: Theme.mono; pixelSize: 9; bold: true }
+                                        color: magiCol.cAgree ? Theme.hazard : Theme.red
+                                    }
+                                    Text {
+                                        text: magiCol.cSub
+                                        font { family: Theme.mono; pixelSize: 8 }
+                                        color: Theme.mute
+                                    }
+                                }
+                            }
+                            Text {
+                                anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
+                                text: magiCol.cVote
+                                font { family: Theme.mono; pixelSize: 9; bold: true }
+                                color: magiCol.cAgree ? Theme.hazard : Theme.red
                             }
                         }
                     }
@@ -447,24 +540,26 @@ Scope {
                         Column {
                             anchors { fill: parent; margins: 6 }
                             spacing: 4
-                            Row {
+                            Item {
                                 width: parent.width
+                                height: 16
                                 Text {
+                                    anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                                     text: "EVA-01 SYNCH"
                                     font { family: Theme.mono; pixelSize: 9; bold: true }
                                     color: Theme.hazard
                                 }
                                 Text {
-                                    anchors.right: parent.right
-                                    text: "88.5%"
+                                    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+                                    text: (magiCol.synchVal * 100).toFixed(1) + "%"
                                     font { family: Theme.mono; pixelSize: 11; bold: true }
                                     color: Theme.crimson
                                 }
                             }
                             // Segmented bar for synch
-                            Seg { width: parent.width; height: 6; n: 16; f: 0.885; on: Theme.crimson; off: Theme.s3 }
+                            Seg { width: parent.width; height: 6; n: 16; f: magiCol.synchVal; on: Theme.crimson; off: Theme.s3 }
                             Text {
-                                text: "HARMONIC DISTORTION: ±0.012% [STABLE]"
+                                text: `HARMONIC DISTORTION: ±0.0${Math.floor(SysStats.cpu * 35 + 8)}% [${SysStats.cpu > 0.8 ? "DRIFT" : "STABLE"}]`
                                 font { family: Theme.mono; pixelSize: 8 }
                                 color: Theme.mute
                             }

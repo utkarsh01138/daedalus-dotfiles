@@ -50,12 +50,12 @@ Singleton {
     // Wallpaper-specific profile detection (adaptive contrast for light sketch vs dark wallpapers):
     readonly property bool isLightWall: {
         const w = (Theme.wall || "").toLowerCase();
-        return w.includes("evan.png") || w.includes("white") || w.includes("light") || (!tones.length && st.light);
+        return w.includes("evengalblood") || (w.includes("white") && !w.includes("evan")) || (w.includes("light") && !w.includes("evan")) || (st.light && !w.includes("evan"));
     }
 
     readonly property color hudText: isLightWall ? "#0A0A0E" : "#FFFFFF"
     readonly property color hudSubText: isLightWall ? "#1F1F28" : "#EAEAEB"
-    readonly property color hudMute: isLightWall ? "#3E3E4D" : "#72727E"
+    readonly property color hudMute: isLightWall ? "#3E3E4D" : "#A0A0B0"
     readonly property color hudReticle: isLightWall ? "#C0000A" : Theme.accent
     readonly property color hudGrid: isLightWall ? "#B8B8C0" : Theme.s3
     readonly property color hudDim: isLightWall ? "#252530" : Theme.mute

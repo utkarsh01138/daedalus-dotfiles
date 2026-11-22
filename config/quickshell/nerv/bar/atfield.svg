@@ -1,0 +1,41 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="atGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF3B43" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#E51D24" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#E51D24" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Glowing energy aura -->
+  <polygon points="471.73,341.84 341.84,471.73 158.16,471.73 28.27,341.84 28.27,158.16 158.16,28.27 341.84,28.27 471.73,158.16" fill="url(#atGlow)"/>
+
+  <!-- Radial Vertex Phase Connectors -->
+  <line x1="250" y1="250" x2="471.73" y2="341.84" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="341.84" y2="471.73" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="158.16" y2="471.73" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="28.27" y2="341.84" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="28.27" y2="158.16" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="158.16" y2="28.27" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="341.84" y2="28.27" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+  <line x1="250" y1="250" x2="471.73" y2="158.16" stroke="#FF3B43" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="4,4"/>
+
+  <!-- Octagon Layer 1 (Outer Perimeter) -->
+  <polygon points="471.73,341.84 341.84,471.73 158.16,471.73 28.27,341.84 28.27,158.16 158.16,28.27 341.84,28.27 471.73,158.16" fill="rgba(229, 29, 36, 0.04)" stroke="#FF3B43" stroke-width="3"/>
+
+  <!-- Octagon Layer 2 -->
+  <polygon points="434.78,326.54 326.54,434.78 173.46,434.78 65.22,326.54 65.22,173.46 173.46,65.22 326.54,65.22 434.78,173.46" fill="rgba(255, 59, 67, 0.05)" stroke="#E51D24" stroke-width="1.5" stroke-dasharray="8,4"/>
+
+  <!-- Octagon Layer 3 -->
+  <polygon points="397.82,311.23 311.23,397.82 188.77,397.82 102.18,311.23 102.18,188.77 188.77,102.18 311.23,102.18 397.82,188.77" fill="none" stroke="#FF3B43" stroke-width="2"/>
+
+  <!-- Octagon Layer 4 -->
+  <polygon points="360.87,295.92 295.92,360.87 204.08,360.87 139.13,295.92 139.13,204.08 204.08,139.13 295.92,139.13 360.87,204.08" fill="rgba(229, 29, 36, 0.06)" stroke="#E51D24" stroke-width="1.2"/>
+
+  <!-- Octagon Layer 5 (Core Barrier) -->
+  <polygon points="323.91,280.61 280.61,323.91 219.39,323.91 176.09,280.61 176.09,219.39 219.39,176.09 280.61,176.09 323.91,219.39" fill="rgba(255, 59, 67, 0.12)" stroke="#FF3B43" stroke-width="2.5"/>
+
+  <!-- Center Reticle Cross -->
+  <circle cx="250" cy="250" r="14" fill="none" stroke="#FF3B43" stroke-width="1.5"/>
+  <circle cx="250" cy="250" r="4" fill="#FF3B43"/>
+</svg>
