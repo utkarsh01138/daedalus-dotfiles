@@ -87,6 +87,7 @@ Built-in desktop profile switching engine (`~/daedalus/config/quickshell/rice/ri
 | `Super` | Open Bottom Deck Dashboard (Click outside to dismiss) | Deck |
 | `Super + A` | Open Quick Actions & Notification Center | Quick |
 | `Super + V` | Open Clipboard History (Direct paste on `Enter`) | Clip |
+| `Super + G` | Toggle Floating Antigravity (`agy`) Scratchpad | Daedalus Agent |
 | `Super + .` | Open Charms & Emoji Picker (30 Recent History) | Charms |
 | `Super + Alt + O` | Toggle Astronomy Red Night Vision Mode | Daedalus Optics |
 | `Super + Shift + O` | Toggle Retro CRT Scanlines | Daedalus Optics |
