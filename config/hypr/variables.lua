@@ -34,6 +34,7 @@ return {
         sysmon        = "kitty --class btop -T btop btop",
         music         = "TBA",
         communication = "Telegram",
+        agy           = "kitty --class agy-term -e /home/utki/.local/bin/agy",
     },
 
     -- Touchpad
@@ -116,6 +117,7 @@ return {
     kbToggleDesktop            = "SUPER + D",
     kbCommunicationWs          = "",
     kbTodoWs                   = "SUPER + R",
+    kbAgy                      = "SUPER + G",
 
     -- Apps
     kbTerminal                 = "SUPER + T",

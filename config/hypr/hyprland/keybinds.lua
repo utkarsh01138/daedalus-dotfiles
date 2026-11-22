@@ -143,6 +143,7 @@ if vars.kbCommunicationWs and vars.kbCommunicationWs ~= "" then
     hl.bind(vars.kbCommunicationWs, fn.toggle_special("communication"))
 end
 hl.bind(vars.kbTodoWs, fn.toggle_special("todo"))
+hl.bind(vars.kbAgy or "SUPER + G", fn.toggle_special("agy"))
 
 -- Audio settings
 hl.bind("CTRL + ALT + V", hl.dsp.exec_cmd(vars.audioSettings))
