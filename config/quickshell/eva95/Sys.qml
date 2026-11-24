@@ -170,6 +170,7 @@ Singleton {
     function shaderLabel(name) {
         if (!name) return "shader";
         const map = {
+            "eva95-crt-amber": "eva-crt",
             "astronomy-red": "red",
             "crt-scanlines": "crt",
             "grayscale": "mono",
@@ -194,6 +195,7 @@ Singleton {
         }
     }
     readonly property var shaderList: [
+        { id: "eva95-crt-amber", label: "EVA CRT", desc: "1995 NERV Sony Trinitron CRT", fav: true },
         { id: "astronomy-red", label: "Astro Red", desc: "Scotopic night vision", fav: true },
         { id: "crt-scanlines", label: "Retro CRT", desc: "1200p scanlines & vignette", fav: true },
         { id: "blueprint", label: "Blueprint", desc: "Prussian blue cyanotype", fav: true },

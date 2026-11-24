@@ -1,5 +1,5 @@
-# Cava Audio Visualizer Configuration - NERV Tactical Equalizer
-# Segmented frequency meters with gradient: Amber -> Crimson
+# Cava Audio Visualizer Configuration - EVA-95 Terminal Dogma Energy Spectrum
+# Segmented frequency meters with gradient: Phosphor Green -> Amber -> Peak High-Beam Orange
 
 [general]
 framerate = 60
@@ -15,15 +15,15 @@ bar_width = 2
 bar_spacing = 1
 
 [color]
-# NERV gradient: Blood Crimson (#E51D24) to Piercing Neon Red (#FF3B43)
+# EVA-95 1995 CRT gradient: Phosphor Mint Green to High-Beam Amber/Orange
 gradient = 1
 gradient_count = 6
-gradient_color_1 = '#FF6B6B'
-gradient_color_2 = '#FF4D4D'
-gradient_color_3 = '#FF3B43'
-gradient_color_4 = '#E51D24'
-gradient_color_5 = '#BA181B'
-gradient_color_6 = '#660708'
+gradient_color_1 = '#FFAA00'
+gradient_color_2 = '#FF8800'
+gradient_color_3 = '#FF6600'
+gradient_color_4 = '#00FF66'
+gradient_color_5 = '#00DD55'
+gradient_color_6 = '#008833'
 
 [smoothing]
 noise_reduction = 75

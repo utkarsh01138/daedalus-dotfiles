@@ -1,37 +1,37 @@
 # EVA-95 Central Dogma Starship Prompt
-# Militaristic telemetry bracketed style: [EVA-95//MAGI-01] [path] [BRANCH:main] >>
+# CRT Amber phosphor telemetry bracketed style: [EVA-95//MAGI-01] [path] [BRANCH:main] >>
 add_newline = false
 format = "$custom$directory$git_branch$git_status$cmd_duration$character"
 
 [custom.eva95]
 command = "echo '[EVA-95//MAGI-01]'"
 when = "true"
-style = "bold #E51D24"
+style = "bold #FFAA00"
 format = "[$output]($style) "
 
 [directory]
-style = "bold #E51D24"
+style = "bold #FF8800"
 truncation_length = 4
 truncation_symbol = "…/"
 read_only = " [LOCKED]"
-read_only_style = "bold #B00010"
+read_only_style = "bold #D46200"
 format = "[$path]($style)[$read_only]($read_only_style) "
 
 [git_branch]
 symbol = "BRANCH:"
-style = "bold #FF3B43"
+style = "bold #00FF66"
 format = "\\[[$symbol$branch]($style)\\] "
 
 [git_status]
-style = "bold #B00010"
+style = "bold #FF2200"
 format = "([$all_status$ahead_behind]($style) )"
 
 [cmd_duration]
 min_time = 2000
-style = "bold #787884"
+style = "bold #7E6A4C"
 format = "\\[[$duration]($style)\\] "
 
 [character]
-success_symbol = "[>>](bold #E51D24)"
-error_symbol = "[>>](bold #FF3B43)"
-vimcmd_symbol = "[<<](bold #00E5FF)"
+success_symbol = "[>>](bold #FFAA00)"
+error_symbol = "[>>](bold #FF2200)"
+vimcmd_symbol = "[<<](bold #00FFFF)"

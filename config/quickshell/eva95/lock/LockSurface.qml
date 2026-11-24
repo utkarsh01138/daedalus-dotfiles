@@ -33,6 +33,23 @@ WlSessionLockSurface {
     property real wave: 0
     NumberAnimation on wave { running: root.auth.busy; from: 0; to: 1; duration: 700; loops: Animation.Infinite }
 
+    // EVA-95 Fullscreen CRT Boot Terminal Backdrop (Anchored directly to physical display surface)
+    AnimatedImage {
+        id: crtBoot
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+        source: Quickshell.shellPath("assets/gifs/opt/ja_hisys_boot_terminal_2x.gif")
+        opacity: 0.88
+        playing: true
+        cache: true
+    }
+
+    // CRT Scrim to ensure clock and authentication prompt are crisp
+    Rectangle {
+        anchors.fill: parent
+        color: Qt.rgba(0.03, 0.03, 0.04, 0.45)
+    }
+
     Stage {
         id: stage
         focus: true
@@ -47,28 +64,42 @@ WlSessionLockSurface {
             e.accepted = true;
         }
 
-        Item {
-            opacity: root.ph(0, 0.6)
-            Orb { visible: Theme.state.orb; x: stage.width - 720; y: stage.height - 580 }
-            Wall { width: stage.width; height: stage.height; path: Theme.wallSrc(Theme.scr(root.screen?.name, "wall")) }
-        }
-
-        // Tactical Emergency Warning Header
-        Row {
+        // Tactical Emergency Warning Header (1995 Gainax TV Show Style)
+        Column {
             anchors.horizontalCenter: parent.horizontalCenter
-            y: 90
-            spacing: 8
+            y: 70
+            spacing: 6
             opacity: root.ph(0.1, 0.45)
-            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 14; color: Theme.accent }
-            Text {
-                text: "EMERGENCY // NERV SECURITY PROTOCOL // TERMINAL LOCKED"
-                font.family: Theme.mono
-                font.pixelSize: 13
-                font.bold: true
-                font.letterSpacing: 2
-                color: Theme.hazard
+
+            Rectangle {
+                width: 580
+                height: 28
+                color: Theme.accent
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 8
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: "#08080A" }
+                    Text {
+                        text: "■ 特務機関 NERV // 第３新東京市 本部 防護壁稼働中"
+                        font { family: Theme.eva; pixelSize: 11; bold: true; letterSpacing: 1.5 }
+                        color: "#08080A"
+                    }
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: "#08080A" }
+                }
             }
-            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 14; color: Theme.accent }
+
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 320
+                height: 20
+                color: Theme.red
+                Text {
+                    anchors.centerIn: parent
+                    text: "【 緊急態勢 // 操縦者認証キー入力 】"
+                    font { family: Theme.eva; pixelSize: 9; bold: true; letterSpacing: 1.2 }
+                    color: "#08080A"
+                }
+            }
         }
 
         Lb {
@@ -167,23 +198,34 @@ WlSessionLockSurface {
                     Repeater {
                         id: typed
                         model: Math.min(root.auth.buffer.length, 16)
-                        // новая точка выщёлкивается; пока pam думает — по точкам бежит волна
+                        // CRT rectangular authorization block
                         Rectangle {
                             required property int index
                             anchors.verticalCenter: parent.verticalCenter
-                            width: 11
-                            height: 11
-                            radius: 5.5
-                            color: root.auth.fail ? Theme.red : Theme.fg
+                            width: 12
+                            height: 18
+                            radius: 0
+                            color: root.auth.fail ? Theme.red : Theme.accent
                             opacity: root.auth.busy && Math.abs(root.wave * (typed.count + 2) - 1 - index) > 1.2 ? 0.3 : 1
                             NumberAnimation on scale { from: 0.2; to: 1; duration: 180; easing.type: Easing.OutCubic }
                         }
                     }
-                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 2; height: 24; color: Theme.accent; opacity: root.blink ? 1 : 0 }
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; color: Theme.accent; opacity: root.blink ? 1 : 0 }
                     Repeater {
                         model: Math.max(0, 6 - root.auth.buffer.length)
-                        Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 11; height: 11; radius: 5.5; color: Theme.s3 }
+                        Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 12; height: 18; radius: 0; color: Theme.s3 }
                     }
+                }
+
+                // Authentication Failure Emergency Banner Overlay
+                AnimatedImage {
+                    anchors.centerIn: parent
+                    width: parent.width
+                    height: parent.height
+                    fillMode: Image.PreserveAspectFit
+                    source: Quickshell.shellPath("assets/gifs/opt/dummyplug_rei00_warning_2x.gif")
+                    visible: root.auth.fail
+                    playing: root.auth.fail
                 }
 
                 SequentialAnimation {

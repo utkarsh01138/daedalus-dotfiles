@@ -5,10 +5,12 @@ import Quickshell.Wayland
 import qs
 import qs.components
 
-// подложка дома, отдельным окном на слое background: сетка точек, полутоновый шар, обои. Сам дом (часы, бенто) — слоем
-// выше, прозрачный: он перерисовывается часто (двоеточие, кольца, крутящаяся обложка), а обои — полноэкранный шейдер,
-// и в одном окне считались бы на каждый его кадр. Здесь кадр — только на волну, смену вида и дыхание шара.
-// Картинка закрыла всё — сетку и шар не рисуем, шар не дышит: окно стоит
+// =============================================================================
+// EVA-95 CENTRAL DOGMA CRT BACKGROUND CANVAS (1995 NGE TV SERIES STYLE)
+// =============================================================================
+// Layer: Background, isolated layershell namespace eva95-back.
+// Renders wallpaper with authentic CRT amber aperture grille raster scanlines,
+// tactical coordinate grid, and Sony Trinitron tube vignette on top.
 PanelWindow {
     id: root
 
@@ -16,21 +18,47 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     color: Theme.bg
     WlrLayershell.layer: WlrLayer.Background
-    WlrLayershell.namespace: "glyph-back"
+    WlrLayershell.namespace: "eva95-back"
 
-    readonly property bool home: (Hyprland.monitorFor(screen)?.activeWorkspace?.toplevels.values.length ?? 0) === 0 // пуст свой экран
-    property real phase: 0
-    Timer { running: root.home && orb.visible; interval: 100; repeat: true; onTriggered: root.phase += 0.1 }
+    readonly property bool home: (Hyprland.monitorFor(screen)?.activeWorkspace?.toplevels.values.length ?? 0) === 0
 
     Stage {
         id: stage
-        Image {
-            visible: Theme.state.grid && !wall.opaque
+
+        // Wallpaper renderer
+        Wall {
+            id: wall
             anchors.fill: parent
-            fillMode: Image.Tile
-            source: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="1.5" fill="#${Theme.hex(Theme.s2)}"/></svg>`)
+            path: Theme.wallSrc(Theme.scr(root.screen?.name, "wall"))
+            animate: !Sys.wallOpen
         }
-        Orb { id: orb; visible: Theme.state.orb && !wall.opaque; x: stage.width - 720; y: stage.height - 580; phase: root.phase }
-        Wall { id: wall; anchors.fill: parent; path: Theme.wallSrc(Theme.scr(root.screen?.name, "wall")); animate: !Sys.wallOpen }
+
+        // Authentic CRT Scanline, Phosphor Grid & Tube Vignette (Rendered ON TOP of wallpaper)
+        Item {
+            anchors.fill: parent
+
+            // Horizontal CRT scanlines (subtle 1080p raster)
+            Image {
+                anchors.fill: parent
+                fillMode: Image.Tile
+                opacity: 0.12
+                source: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1" height="4"><rect width="1" height="1.5" fill="#${Theme.hex(Theme.accent)}"/></svg>`)
+            }
+
+            // Tactical coordinate grid lines (64x64 geofront grid)
+            Image {
+                anchors.fill: parent
+                fillMode: Image.Tile
+                opacity: 0.08
+                source: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><line x1="0" y1="0" x2="64" y2="0" stroke="#${Theme.hex(Theme.accent)}" stroke-width="0.5"/><line x1="0" y1="0" x2="0" y2="64" stroke="#${Theme.hex(Theme.accent)}" stroke-width="0.5"/></svg>`)
+            }
+
+            // CRT Glass Tube Corner Vignette (Simulates curved Trinitron glass phosphors)
+            Image {
+                anchors.fill: parent
+                opacity: 0.45
+                source: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><defs><radialGradient id="v" cx="50%" cy="50%" r="70%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="1"/></radialGradient></defs><rect width="800" height="600" fill="url(#v)"/></svg>`)
+            }
+        }
     }
 }

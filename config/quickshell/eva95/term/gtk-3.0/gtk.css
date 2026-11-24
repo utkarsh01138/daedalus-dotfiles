@@ -1,66 +1,65 @@
-/* NERV Tactical Command GTK 3 Theme
-   Palette: Bunker Black (#060608), Panel (#121216), Blood Crimson (#E51D24), Neon Red (#FF3B43), Chalk (#EAEAEB)
-   Geometry: ZERO CURVES (0px rounding), strict industrial chamfers and rectangular surfaces */
-@define-color accent_color #E51D24;
-@define-color accent_bg_color #E51D24;
-@define-color accent_fg_color #060608;
-@define-color destructive_color #E51D24;
-@define-color destructive_bg_color #E51D24;
-@define-color destructive_fg_color #EAEAEB;
-@define-color window_bg_color #060608;
-@define-color window_fg_color #EAEAEB;
-@define-color view_bg_color #121216;
-@define-color view_fg_color #EAEAEB;
-@define-color headerbar_bg_color #060608;
-@define-color headerbar_fg_color #E51D24;
-@define-color headerbar_border_color #202028;
-@define-color headerbar_backdrop_color #060608;
-@define-color popover_bg_color #121216;
-@define-color popover_fg_color #EAEAEB;
-@define-color dialog_bg_color #121216;
-@define-color dialog_fg_color #EAEAEB;
-@define-color card_bg_color #1A1A20;
-@define-color card_fg_color #EAEAEB;
-@define-color sidebar_bg_color #060608;
-@define-color sidebar_fg_color #EAEAEB;
-@define-color sidebar_border_color #202028;
-@define-color sidebar_backdrop_color #060608;
-@define-color borders #202028;
+/* EVA-95 Central Dogma CRT GTK 3 Theme
+   Palette: CRT Black (#08080A), Chassis (#14120E), CRT Amber Phosphor (#FF8800), High-Beam (#FFAA00), Chalk (#FFF4E0)
+   Geometry: ZERO CURVES (0px rounding), authentic 1995 CRT terminal bevels */
+@define-color accent_color #FFAA00;
+@define-color accent_bg_color #FF8800;
+@define-color accent_fg_color #08080A;
+@define-color destructive_color #FF2200;
+@define-color destructive_bg_color #FF2200;
+@define-color destructive_fg_color #FFF4E0;
+@define-color window_bg_color #08080A;
+@define-color window_fg_color #FFF4E0;
+@define-color view_bg_color #14120E;
+@define-color view_fg_color #FFF4E0;
+@define-color headerbar_bg_color #08080A;
+@define-color headerbar_fg_color #FF8800;
+@define-color headerbar_border_color #382C1E;
+@define-color headerbar_backdrop_color #08080A;
+@define-color popover_bg_color #14120E;
+@define-color popover_fg_color #FFF4E0;
+@define-color dialog_bg_color #14120E;
+@define-color dialog_fg_color #FFF4E0;
+@define-color card_bg_color #1E1A14;
+@define-color card_fg_color #FFF4E0;
+@define-color sidebar_bg_color #08080A;
+@define-color sidebar_fg_color #FFF4E0;
+@define-color sidebar_border_color #382C1E;
+@define-color sidebar_backdrop_color #08080A;
+@define-color borders #382C1E;
 
 /* gtk3 (adw-gtk3) */
-@define-color theme_bg_color #060608;
-@define-color theme_fg_color #EAEAEB;
-@define-color theme_base_color #121216;
-@define-color theme_text_color #EAEAEB;
-@define-color theme_selected_bg_color #E51D24;
-@define-color theme_selected_fg_color #060608;
-@define-color insensitive_fg_color #32323E;
+@define-color theme_bg_color #08080A;
+@define-color theme_fg_color #FFF4E0;
+@define-color theme_base_color #14120E;
+@define-color theme_text_color #FFF4E0;
+@define-color theme_selected_bg_color #FF8800;
+@define-color theme_selected_fg_color #08080A;
+@define-color insensitive_fg_color #382C1E;
 
 window, popover, menu { font-family: "Space Grotesk"; }
 
-/* Zero curves: strict 0px border radius for military rectangular tactical look */
-button, entry { border-radius: 0px; border: 1px solid #202028; }
-entry { padding-left: 12px; padding-right: 12px; background-color: #121216; color: #EAEAEB; }
-button:checked { background-color: #E51D24; color: #060608; }
+/* Zero curves: strict 0px border radius for CRT terminal aesthetic */
+button, entry { border-radius: 0px; border: 1px solid #382C1E; }
+entry { padding-left: 12px; padding-right: 12px; background-color: #14120E; color: #FFF4E0; }
+button:checked { background-color: #FF8800; color: #08080A; }
 .linked:not(.vertical) > button, .linked:not(.vertical) > entry { border-radius: 0px; }
 .linked.vertical > button, .linked.vertical > entry { border-radius: 0px; }
-popover > contents, popover.background { border-radius: 0px; border: 1px solid #E51D24; }
+popover > contents, popover.background { border-radius: 0px; border: 1px solid #FF8800; }
 
-switch:checked { background-color: #E51D24; }
-switch:checked slider { background-color: #060608; border-radius: 0px; }
+switch:checked { background-color: #FF8800; }
+switch:checked slider { background-color: #08080A; border-radius: 0px; }
 switch slider { border-radius: 0px; }
 
-scrollbar slider { border-radius: 0px; background-color: #32323E; }
-scrollbar slider:hover, scrollbar slider:active { background-color: #E51D24; }
+scrollbar slider { border-radius: 0px; background-color: #382C1E; }
+scrollbar slider:hover, scrollbar slider:active { background-color: #FF8800; }
 
-/* ---- Thunar: Tactical telemetry styling ---- */
-.thunar paned > separator { min-width: 8px; background: #060608; box-shadow: none; }
+/* ---- Thunar: CRT telemetry styling ---- */
+.thunar paned > separator { min-width: 8px; background: #08080A; box-shadow: none; }
 
-.thunar .standard-view { background-color: #121216; border-radius: 0px; border: 1px solid #202028; padding: 6px; margin: 0 8px 0 0; }
+.thunar .standard-view { background-color: #14120E; border-radius: 0px; border: 1px solid #382C1E; padding: 6px; margin: 0 8px 0 0; }
 .thunar .standard-view .view:not(.rubberband), .thunar .standard-view .view *:not(.rubberband) { background-color: transparent; }
-.thunar .standard-view .view:not(.rubberband) *:selected,
-.thunar .standard-view .view *:not(.rubberband) *:selected { background-color: #E51D24; color: #060608; }
-.thunar .standard-view .view:not(.rubberband) *:selected:backdrop,
-.thunar .standard-view .view *:not(.rubberband) *:selected:backdrop { background-color: #E51D24; color: #060608; }
-.thunar .sidebar { background-color: #060608; }
-.thunar .sidebar *:selected, .thunar .sidebar *:selected:backdrop { background-color: #E51D24; color: #060608; }
+.thunar .standard-view .view *:not(.rubberband):selected { background-color: #FF8800; color: #08080A; }
+.thunar .standard-view .view *:not(.rubberband) *:selected { background-color: #FF8800; color: #08080A; }
+.thunar .standard-view .view *:not(.rubberband) *:selected:backdrop { background-color: #FF8800; color: #08080A; }
+.thunar .sidebar { background-color: #08080A; border: none; padding: 4px; }
+.thunar .sidebar *:selected, .thunar .sidebar *:selected:backdrop { background-color: #FF8800; color: #08080A; }

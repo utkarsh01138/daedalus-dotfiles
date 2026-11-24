@@ -19,7 +19,7 @@ Row {
             height: Math.max(3, Math.round(parent.height * Math.min(1, Math.max(0.1, load))))
             anchors.bottom: parent.bottom
             radius: 0
-            color: load > 0.85 ? Theme.crimson : load > 0.6 ? Theme.hazard : Theme.bloodRed
+            color: load > 0.85 ? Theme.red : load > 0.6 ? Theme.hazard : Theme.amber
             opacity: 0.85
 
             Behavior on height {

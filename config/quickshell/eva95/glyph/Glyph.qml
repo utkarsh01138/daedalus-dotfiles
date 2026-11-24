@@ -79,17 +79,17 @@ Scope {
         target: UPower
         function onOnBatteryChanged() {
             root.warned = 100;
-            if (UPower.onBattery) root.power("On battery", "\u{F0079}", false, root.bat.timeToEmpty ? `${root.hm(root.bat.timeToEmpty)} left` : "");
-            else root.power("Charging", "\u{F0084}", false, root.bat.timeToFull ? `full in ${root.hm(root.bat.timeToFull)}` : "");
+            if (UPower.onBattery) root.power("【 内部電源作動 // 活動限界開始 】", "\u{F0079}", false, root.bat.timeToEmpty ? `LIMIT: ${root.hm(root.bat.timeToEmpty)}` : "");
+            else root.power("【 外部電源接続 // UMBILICAL POWER ACTIVE 】", "\u{F0084}", false, root.bat.timeToFull ? `CHARGE: ${root.hm(root.bat.timeToFull)}` : "UNLIMITED");
         }
     }
     Connections {
         target: root.bat
-        function onStateChanged() { if (root.bat.state === UPowerDeviceState.FullyCharged && !UPower.onBattery) root.power("Fully charged", "\u{F0079}"); }
+        function onStateChanged() { if (root.bat.state === UPowerDeviceState.FullyCharged && !UPower.onBattery) root.power("【 外部電源完了 // UMBILICAL FEED 100% 】", "\u{F0079}"); }
         function onPercentageChanged() {
             if (!UPower.onBattery) return;
-            if (root.pct <= 5 && root.warned > 5) { root.warned = 5; root.power("Battery critical", "\u{F0083}", true, "plug in now"); }
-            else if (root.pct <= 15 && root.warned > 15) { root.warned = 15; root.power("Battery low", "\u{F0083}", false, "plug in soon"); }
+            if (root.pct <= 5 && root.warned > 5) { root.warned = 5; root.power("【 活動限界警告 // CRITICAL DISCHARGE SCRAM 】", "\u{F0083}", true, "EMERGENCY SHUTDOWN IMMINENT"); }
+            else if (root.pct <= 15 && root.warned > 15) { root.warned = 15; root.power("【 活動限界間近 // DEPLETION IMMINENT 】", "\u{F0083}", false, "PLUG IN UMBILICAL CABLE"); }
         }
     }
     function dismiss(key) { for (let i = 0; i < stack.count; i++) if (stack.get(i).key === key) return stack.setProperty(i, "leaving", true); }
@@ -184,14 +184,45 @@ Scope {
                             x: (600 - width) / 2
                             y: -24 * (1 - c.drop)
                             opacity: c.drop
-                            radius: Theme.corner(Math.min(34, height / 2))
+                            radius: 0
                             clip: true
                             color: Theme.s1
-                            border { width: 1; color: c.crit ? Theme.red : Theme.fg }
+                            border { width: c.crit ? 2 : 1; color: c.crit ? Theme.red : Theme.accent }
 
-                            // содержимое — в полный размер по центру: ширина текста не меняется, пока плашка растёт
+                            // Tactical Corner Reticles
+                            Rectangle { x: -1; y: -1; width: 8; height: 2; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { x: -1; y: -1; width: 2; height: 8; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 8; height: 2; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 2; height: 8; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 8; height: 2; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 2; height: 8; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 8; height: 2; color: c.crit ? Theme.red : Theme.hazard }
+                            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 2; height: 8; color: c.crit ? Theme.red : Theme.hazard }
+
+                            // Tactical Top Banner
+                            Rectangle {
+                                anchors { left: parent.left; right: parent.right; top: parent.top }
+                                height: 18
+                                color: c.crit ? Theme.red : Theme.accent
+                                Row {
+                                    anchors.centerIn: parent
+                                    spacing: 8
+                                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: "#000000" }
+                                    Text {
+                                        text: c.crit
+                                            ? "【 非常事態 // EMERGENCY ALERT // NERV CENTRAL DOGMA 】"
+                                            : "【 通信受信 // TRANSMISSION INCOMING // MAGI-01 】"
+                                        font { family: Theme.mono; pixelSize: 8; bold: true; letterSpacing: 1.0 }
+                                        color: "#000000"
+                                    }
+                                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: "#000000" }
+                                }
+                            }
+
+                            // содержимое — в полный размер по центру
                             Item {
                                 anchors.centerIn: parent
+                                anchors.verticalCenterOffset: 9
                                 width: 600
                                 height: c.full
                                 opacity: c.ph(0.7, 1)
@@ -200,11 +231,12 @@ Scope {
                                     id: ic
                                     x: 16
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: 54
-                                    height: 54
-                                    radius: 27
+                                    width: 48
+                                    height: 48
+                                    radius: 0
                                     color: Theme.s2
-                                    Icon { anchors.centerIn: parent; visible: !img.visible; text: c.glyph || "\u{F009A}"; font.pixelSize: 24 }
+                                    border { width: 1; color: c.crit ? Theme.red : Theme.line }
+                                    Icon { anchors.centerIn: parent; visible: !img.visible; text: c.glyph || "\u{F009A}"; font.pixelSize: 22 }
                                     Image {
                                         id: img
                                         anchors.centerIn: parent
@@ -220,15 +252,21 @@ Scope {
                                 Column {
                                     id: txt
                                     anchors { left: ic.right; leftMargin: 16; right: dot.left; rightMargin: 16; verticalCenter: parent.verticalCenter }
-                                    Lb { width: parent.width; elide: Text.ElideRight; text: `${c.app} · now` }
+                                    Text {
+                                        width: parent.width
+                                        elide: Text.ElideRight
+                                        text: `[ ORIGIN: ${(c.app || "SYSTEM").toUpperCase()} ] // PRIORITY: ${c.crit ? "CRITICAL ALPHA" : "STANDARD"}`
+                                        font { family: Theme.mono; pixelSize: 9; bold: true; letterSpacing: 0.8 }
+                                        color: c.crit ? Theme.red : Theme.hazard
+                                    }
                                     Text {
                                         width: parent.width
                                         topPadding: 2
                                         elide: Text.ElideRight
                                         text: c.summary
                                         textFormat: Text.PlainText
-                                        font { family: Theme.ui; pixelSize: 17; weight: Font.DemiBold }
-                                        color: Theme.fg
+                                        font { family: Theme.ui; pixelSize: 15; weight: Font.Bold }
+                                        color: c.crit ? Theme.red : Theme.fg
                                     }
                                     Text {
                                         width: parent.width
@@ -238,12 +276,20 @@ Scope {
                                         wrapMode: Text.Wrap
                                         textFormat: Text.PlainText
                                         text: c.body
-                                        font { family: Theme.ui; pixelSize: 14 }
+                                        font { family: Theme.mono; pixelSize: 11 }
                                         color: Theme.grey
                                     }
                                 }
-                                // красная точка — только у самой новой: красное на экране одно
-                                Rectangle { id: dot; visible: c.index === 0; anchors { right: parent.right; rightMargin: 22; verticalCenter: parent.verticalCenter } width: 12; height: 12; radius: 6; color: Theme.accent }
+                                // Tactical square indicator
+                                Rectangle {
+                                    id: dot
+                                    visible: c.index === 0
+                                    anchors { right: parent.right; rightMargin: 20; verticalCenter: parent.verticalCenter }
+                                    width: 10
+                                    height: 10
+                                    radius: 0
+                                    color: c.crit ? Theme.red : Theme.accent
+                                }
                             }
 
                             // клик — действие по умолчанию; плашка уходит, в истории остаётся. Уведомление могли уже закрыть —
@@ -325,15 +371,26 @@ Scope {
         WlrLayershell.namespace: "glyph-edge"
         Stage { id: st }
     }
-    // капсула-значение рядом с полосой; vertical — содержимое столбиком
+    // Tactical rectangular status badge
     component Tag: Rectangle {
         default property alias content: box.data
         property bool vertical
         width: vertical ? Math.max(52, box.width + 24) : box.width + 32
         height: vertical ? box.height + 36 : 52
-        radius: Theme.corner(Math.min(width, height) / 2)
+        radius: 0
         color: Theme.s1
-        border { width: 1; color: Theme.s2 }
+        border { width: 1; color: Theme.accent }
+
+        // Tactical Corner Reticles
+        Rectangle { x: -1; y: -1; width: 6; height: 1; color: Theme.hazard }
+        Rectangle { x: -1; y: -1; width: 1; height: 6; color: Theme.hazard }
+        Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 6; height: 1; color: Theme.hazard }
+        Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 1; height: 6; color: Theme.hazard }
+        Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 6; height: 1; color: Theme.hazard }
+        Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 6; color: Theme.hazard }
+        Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 6; height: 1; color: Theme.hazard }
+        Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 6; color: Theme.hazard }
+
         Grid {
             id: box
             anchors.centerIn: parent

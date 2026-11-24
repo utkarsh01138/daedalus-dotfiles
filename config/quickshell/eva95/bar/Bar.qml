@@ -45,208 +45,350 @@ PanelWindow {
     readonly property var top: ToplevelManager.activeToplevel
     readonly property var bat: UPower.displayDevice
     readonly property var wifi: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
+    readonly property bool isAlert: SysStats.cpu > 0.85 || SysStats.cpuTemp > 80 || (bat.onBattery && bat.percentage < 0.15)
+    readonly property var wsNames: ["01:発令", "02:本部", "03:電算", "04:ケージ", "05:地上", "06:作戦", "07:予備", "08:特務", "09:極秘", "10:終末"]
 
     function go(ws) { Hyprland.dispatch(`hl.dsp.focus({ workspace = "${ws}" })`); }
 
-    SystemClock { id: clock; precision: SystemClock.Minutes }
+    SystemClock { id: clock; precision: SystemClock.Seconds }
 
-    Rectangle {
+    Item {
         id: pill
         anchors.fill: parent
-        radius: 0
-        color: Theme.s1
-        border.width: 0
 
-        // Razor-sharp Evangelion Blood Crimson bottom rail border
+        // Continuous Solid Central Dogma Command Bridge Rail
+        Rectangle {
+            anchors.fill: parent
+            color: Qt.rgba(0.06, 0.05, 0.04, 0.94)
+            border { width: 1; color: Theme.accent }
+        }
+
+        // Continuous Emergency Hazard Warning Tape along the bottom edge of the top bar
+        Canvas {
+            id: barHazardTape
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 3
+            onPaint: {
+                var ctx = getContext("2d");
+                ctx.fillStyle = "#08080A";
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = Theme.accent;
+                for (var x = -height * 2; x < width + height * 2; x += 8) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, height);
+                    ctx.lineTo(x + 4, height);
+                    ctx.lineTo(x + 7, 0);
+                    ctx.lineTo(x + 3, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+        }
+
+        // Technical amber datum hairline across display top edge
         Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            anchors.top: parent.top
+            anchors.topMargin: 1
             height: 1
-            color: Theme.accent
+            color: Qt.rgba(1.0, 0.67, 0.0, 0.28)
         }
 
         Notch { onNotch: d => root.go(d > 0 ? "-1" : "+1") }
 
-        // Left Cluster: NERV Badge, Tactical Sector Selectors, Window Title
-        Row {
-            id: leftCluster
+        // ---------------------------------------------------------------------
+        // POD 1: CENTRAL DOGMA OPERATIONAL DECK & CHANNEL SELECTOR (LEFT CLUSTER)
+        // ---------------------------------------------------------------------
+        Rectangle {
+            id: leftPod
             anchors.left: parent.left
-            anchors.leftMargin: 8
+            anchors.leftMargin: 14
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 10
+            height: 26
+            width: leftCluster.width + 16
+            radius: 0
+            color: Theme.s2
+            border { width: 1; color: Theme.line }
 
-            // NERV Tactical Badge Command Trigger
-            Rectangle {
-                id: mark
-                anchors.verticalCenter: parent.verticalCenter
-                width: 58
-                height: 22
-                radius: 0
-                color: Theme.accent
+            // Tactical Corner Reticles
+            Rectangle { x: -1; y: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { x: -1; y: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 4; color: Theme.hazard }
 
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 4
-                    Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 4
-                        height: 4
-                        color: "#000000"
-                    }
-                    Text {
-                        text: "NERV"
-                        font { family: Theme.mono; pixelSize: 10; bold: true }
-                        color: "#000000"
-                    }
-                }
-                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.markClicked() }
-            }
-
-            // Tactical Workspace Sectors
             Row {
-                id: ws
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
+                id: leftCluster
+                anchors.centerIn: parent
+                spacing: 8
 
-                Repeater {
-                    model: root.count
-
-                    Rectangle {
-                        required property int index
-                        readonly property int n: index + 1
-                        readonly property bool occ: (Hyprland.workspaces.values.find(w => w.id === n)?.toplevels.values.length ?? 0) > 0
-                        readonly property bool on: root.active === n
-                        width: 24
-                        height: 22
-                        radius: 0
-                        color: on ? Theme.accent : occ ? Theme.s2 : "transparent"
-                        border { width: 1; color: on ? Theme.hazard : occ ? Qt.rgba(0.9, 0.11, 0.14, 0.5) : Theme.s3 }
-                        Behavior on color { ColorAnimation { duration: 120 } }
-                        Text {
-                            anchors.centerIn: parent
-                            text: String(parent.n).padStart(2, "0")
-                            font { family: Theme.mono; pixelSize: 9; bold: true }
-                            color: parent.on ? "#000000" : parent.occ ? Theme.fg : Theme.mute
-                        }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.go(parent.n) }
-                    }
-                }
-            }
-
-            // Window Title Bar
-            Item {
-                id: titleItem
-                anchors.verticalCenter: parent.verticalCenter
-                width: Math.max(0, centerCluster.x - leftCluster.x - ws.width - mark.width - 48)
-                height: 22
-                clip: true
-                visible: Theme.state.barTitle && (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0 && !!root.top
-
-                Row {
+                // Central Dogma 1995 CRT Terminal Trigger
+                Rectangle {
+                    id: mark
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 8
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "// [ " + (root.top ? root.top.appId.split(".").pop().toUpperCase() : "") + " ]"
-                        font { family: Theme.mono; pixelSize: 9; bold: true }
-                        color: Theme.accent
+                    width: 82
+                    height: 20
+                    radius: 0
+                    color: Theme.accent
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 4
+                        Rectangle {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 5
+                            height: 5
+                            color: "#08080A"
+                        }
+                        Text {
+                            text: "第１発令所"
+                            font { family: Theme.eva; pixelSize: 9; bold: true }
+                            color: "#08080A"
+                        }
                     }
+                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.markClicked() }
+                }
+
+                // Operational Alert Condition Badge (TV Show Style)
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 20
+                    width: 62
+                    radius: 0
+                    color: root.isAlert ? Theme.red : Theme.phosphor
                     Text {
+                        anchors.centerIn: parent
+                        text: root.isAlert ? "非常事態" : "通常任務"
+                        font { family: Theme.eva; pixelSize: 9; bold: true }
+                        color: "#08080A"
+                    }
+                }
+
+                // Tactical Workspace Channels (Expand with Japanese channel name when active)
+                Row {
+                    id: ws
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
+
+                    Repeater {
+                        model: root.count
+
+                        Rectangle {
+                            required property int index
+                            readonly property int n: index + 1
+                            readonly property bool occ: (Hyprland.workspaces.values.find(w => w.id === n)?.toplevels.values.length ?? 0) > 0
+                            readonly property bool on: root.active === n
+                            width: on ? 64 : occ ? 26 : 22
+                            height: 20
+                            radius: 0
+                            color: on ? Theme.accent : occ ? Theme.s2 : "transparent"
+                            border { width: 1; color: on ? Theme.hazard : occ ? Qt.rgba(1.0, 0.55, 0.0, 0.6) : Theme.s3 }
+                            Behavior on width { NumberAnimation { duration: 140 } }
+                            Behavior on color { ColorAnimation { duration: 140 } }
+
+                            // Industrial Top/Bottom Accents on active channel
+                            Rectangle {
+                                anchors.top: parent.top
+                                width: parent.width
+                                height: 2
+                                color: "#08080A"
+                                visible: parent.on
+                            }
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                width: parent.width
+                                height: 2
+                                color: "#08080A"
+                                visible: parent.on
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: parent.on ? (root.wsNames[index] ?? String(parent.n).padStart(2, "0")) : String(parent.n).padStart(2, "0")
+                                font { family: parent.on ? Theme.eva : Theme.mono; pixelSize: 9; bold: true }
+                                color: parent.on ? "#08080A" : parent.occ ? Theme.fg : Theme.mute
+                            }
+                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.go(parent.n) }
+                        }
+                    }
+                }
+
+                // Window Title Bar
+                Item {
+                    id: titleItem
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: root.top ? Math.min(220, 60 + root.top.title.length * 6) : 0
+                    height: 20
+                    clip: true
+                    visible: Theme.state.barTitle && (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0 && !!root.top
+
+                    Row {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: root.top ? root.top.title : ""
-                        font { family: Theme.ui; pixelSize: 10 }
-                        color: Theme.chalk
-                        elide: Text.ElideRight
-                        width: titleItem.width - 90
+                        spacing: 6
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "// [ " + (root.top ? root.top.appId.split(".").pop().toUpperCase() : "") + " ]"
+                            font { family: Theme.mono; pixelSize: 9; bold: true }
+                            color: Theme.accent
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.top ? root.top.title : ""
+                            font { family: Theme.ui; pixelSize: 10 }
+                            color: Theme.chalk
+                            elide: Text.ElideRight
+                            width: Math.max(30, titleItem.width - 65)
+                        }
                     }
                 }
             }
         }
 
-        // Center Cluster: MAGI Supercomputer Tri-Cluster + Live CPU Oscillograph
-        Row {
-            id: centerCluster
-            anchors.centerIn: parent
-            spacing: 14
-
-            MagiPill {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Oscillograph {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        // Right Cluster: System Telemetry, Tray & Military Clock
-        Row {
-            id: rightCluster
-            anchors.right: parent.right
-            anchors.rightMargin: 10
+        // ---------------------------------------------------------------------
+        // POD 2: MAGI SUPERCOMPUTER DELIBERATION ARRAY (CENTER CLUSTER)
+        // ---------------------------------------------------------------------
+        Rectangle {
+            id: centerPod
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 12
+            height: 26
+            width: centerCluster.width + 16
+            radius: 0
+            color: Theme.s2
+            border { width: 1; color: Theme.line }
 
-            // System Tray Items
+            // Tactical Corner Reticles
+            Rectangle { x: -1; y: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { x: -1; y: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 4; color: Theme.hazard }
+
             Row {
-                anchors.verticalCenter: parent.verticalCenter
+                id: centerCluster
+                anchors.centerIn: parent
                 spacing: 12
 
-                Repeater {
-                    model: Theme.state.bar
-                    Loader {
-                        id: part
-                        required property string modelData
-                        readonly property bool quick: modelData !== "mode" && modelData !== "power"
-                        sourceComponent: root.parts[modelData] ?? null
-                        visible: !!sourceComponent && (modelData !== "battery" || root.bat.isLaptopBattery)
-                        TapHandler { enabled: part.quick; onTapped: root.trayClicked() }
-                        HoverHandler { enabled: part.quick; cursorShape: Qt.PointingHandCursor }
+                MagiPill {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Oscillograph {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // POD 3: TELEMETRY & CHRONO INSTRUMENT CLUSTER (RIGHT CLUSTER)
+        // ---------------------------------------------------------------------
+        Rectangle {
+            id: rightPod
+            anchors.right: parent.right
+            anchors.rightMargin: 14
+            anchors.verticalCenter: parent.verticalCenter
+            height: 26
+            width: rightCluster.width + 16
+            radius: 0
+            color: Theme.s2
+            border { width: 1; color: Theme.line }
+
+            // Tactical Corner Reticles
+            Rectangle { x: -1; y: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { x: -1; y: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; y: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { x: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 4; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 4; height: 1; color: Theme.hazard }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -1; anchors.bottom: parent.bottom; anchors.bottomMargin: -1; width: 1; height: 4; color: Theme.hazard }
+
+            Row {
+                id: rightCluster
+                anchors.centerIn: parent
+                spacing: 10
+
+                // System Tray Items
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
+
+                    Repeater {
+                        model: Theme.state.bar
+                        Loader {
+                            id: part
+                            required property string modelData
+                            readonly property bool quick: modelData !== "mode" && modelData !== "power"
+                            sourceComponent: root.parts[modelData] ?? null
+                            visible: !!sourceComponent && (modelData !== "battery" || root.bat.isLaptopBattery)
+                            TapHandler { enabled: part.quick; onTapped: root.trayClicked() }
+                            HoverHandler { enabled: part.quick; cursorShape: Qt.PointingHandCursor }
+                        }
                     }
                 }
-            }
 
-            // Hairline separator
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 1
-                height: 18
-                color: Theme.s3
-            }
-
-            // Military Clock in FOT-Matisse Pro
-            Row {
-                id: clk
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 3
-                TapHandler { onTapped: root.clockClicked() }
-                HoverHandler { cursorShape: Qt.PointingHandCursor }
-
-                Num {
-                    text: Theme.hh(clock.date)
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: Theme.fg
-                }
-                Num {
-                    text: ":"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: Theme.hazard
-                    opacity: Theme.state.blink && root.dim ? 0.3 : 1
-                }
-                Num {
-                    text: Qt.formatTime(clock.date, "mm")
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: Theme.fg
-                }
-                Text {
+                // Hairline separator
+                Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    leftPadding: 4
-                    text: Qt.locale("en_US").toString(clock.date, "ddd").toUpperCase()
-                    font { family: Theme.mono; pixelSize: 9; bold: true }
-                    color: Theme.grey
+                    width: 1
+                    height: 16
+                    color: Theme.s3
+                }
+
+                // Military Clock in FOT-Matisse Pro
+                Row {
+                    id: clk
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 3
+                    TapHandler { onTapped: root.clockClicked() }
+                    HoverHandler { cursorShape: Qt.PointingHandCursor }
+
+                    Num {
+                        text: Theme.hh(clock.date)
+                        font.pixelSize: 13
+                        font.bold: true
+                        color: Theme.fg
+                    }
+                    Num {
+                        text: ":"
+                        font.pixelSize: 13
+                        font.bold: true
+                        color: Theme.hazard
+                        opacity: Theme.state.blink && root.dim ? 0.3 : 1
+                    }
+                    Num {
+                        text: Qt.formatTime(clock.date, "mm")
+                        font.pixelSize: 13
+                        font.bold: true
+                        color: Theme.fg
+                    }
+                    Num {
+                        text: ":"
+                        font.pixelSize: 13
+                        font.bold: true
+                        color: Theme.hazard
+                        opacity: Theme.state.blink && root.dim ? 0.3 : 1
+                    }
+                    Num {
+                        text: Qt.formatTime(clock.date, "ss")
+                        font.pixelSize: 13
+                        font.bold: true
+                        color: Theme.chalk
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        leftPadding: 4
+                        text: `[${["日", "月", "火", "水", "木", "金", "土"][clock.date.getDay()]}]`
+                        font { family: Theme.eva; pixelSize: 10; bold: true }
+                        color: Theme.hazard
+                    }
                 }
             }
         }
@@ -298,13 +440,13 @@ PanelWindow {
                 width: 5
                 height: 5
                 radius: 0
-                color: root.wifi?.connected ? Theme.crimson : Theme.mute
+                color: root.wifi?.connected ? Theme.phosphor : Theme.mute
             }
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.wifi?.connected ? "NET:OK" : "NET:OFF"
                 font { family: Theme.mono; pixelSize: 9; bold: true }
-                color: root.wifi?.connected ? Theme.chalk : Theme.grey
+                color: root.wifi?.connected ? Theme.phosphor : Theme.grey
             }
         }
     }
@@ -330,7 +472,7 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Sys.muted ? "[MUT]" : "[VOL]"
                 font { family: Theme.mono; pixelSize: 8; bold: true }
-                color: Sys.muted ? Theme.grey : Theme.crimson
+                color: Sys.muted ? Theme.grey : Theme.amber
                 Notch { onNotch: d => Sys.setVol(Sys.vol + d * 0.05) }
             }
             Row {
@@ -343,7 +485,7 @@ PanelWindow {
                         width: 2
                         height: 9
                         radius: 0
-                        color: Sys.muted ? Theme.s3 : (index / 6) < Sys.vol ? Theme.crimson : Theme.s3
+                        color: Sys.muted ? Theme.s3 : (index / 6) < Sys.vol ? Theme.amber : Theme.s3
                     }
                 }
             }
@@ -387,9 +529,9 @@ PanelWindow {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: batc.ac ? "[UMBILICAL]" : "[INT.BAT]"
+                text: batc.ac ? "[外部電源 UMBILICAL]" : `[内部電源 ${(root.bat.percentage*100).toFixed(0)}%]`
                 font { family: Theme.mono; pixelSize: 8; bold: true }
-                color: batc.ac ? Theme.chalk : Theme.hazard
+                color: batc.ac ? Theme.phosphor : Theme.hazard
             }
 
             Row {
@@ -402,7 +544,7 @@ PanelWindow {
                         width: 2
                         height: 10
                         radius: 0
-                        color: (index / 8) < root.bat.percentage ? (root.batLow ? Theme.crimson : Theme.hazard) : Theme.s3
+                        color: (index / 8) < root.bat.percentage ? (root.batLow ? Theme.red : Theme.hazard) : Theme.s3
                         opacity: batc.pulse
                     }
                 }
@@ -420,7 +562,7 @@ PanelWindow {
                     return Math.round(root.bat.percentage * 100) + "%";
                 }
                 font { family: Theme.mono; pixelSize: 9; bold: true }
-                color: root.batLow ? Theme.crimson : Theme.chalk
+                color: root.batLow ? Theme.red : Theme.chalk
             }
         }
     }

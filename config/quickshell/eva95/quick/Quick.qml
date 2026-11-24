@@ -47,7 +47,7 @@ PanelWindow {
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: open && !peeked ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    WlrLayershell.namespace: "glyph-quick"
+    WlrLayershell.namespace: "eva95-quick"
 
     readonly property var wifi: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
     readonly property var net: wifi?.networks.values.find(n => n.connected) ?? null
@@ -58,7 +58,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: "#000000"
-        opacity: 0.35 * root.t
+        opacity: 0.15 * root.t
         MouseArea { anchors.fill: parent; onClicked: root.close() }
     }
 
@@ -75,7 +75,7 @@ PanelWindow {
             HoverHandler { id: keep }
             Rectangle {
                 id: panel
-                anchors { right: parent.right; rightMargin: 14 - 24 * (1 - root.t); bottom: parent.bottom; bottomMargin: 14 }
+                anchors { right: parent.right; rightMargin: 14 - (width + 30) * (1 - root.t); bottom: parent.bottom; bottomMargin: 14 }
                 width: 470
                 height: col.height + 44
                 opacity: root.t
@@ -98,13 +98,14 @@ PanelWindow {
                         width: parent.width
                         height: 20
                         visible: Notes.list.length > 0
-                        Lb { x: 6; text: `notifications · ${Notes.list.length}` }
+                        Lb { x: 6; text: `【 通信記録 // INCOMING DISPATCHES: ${Notes.list.length} 】`; px: 10 }
                         Lb {
                             anchors.right: parent.right
                             rightPadding: 6
                             visible: Notes.list.length > 0
-                            text: "clear all"
-                            color: Theme.fg
+                            text: "[ PURGE ALL / 全消去 ]"
+                            color: Theme.hazard
+                            px: 10
                             TapHandler { onTapped: { root.pin(); Notes.clear(); } }
                         }
                     }
@@ -157,7 +158,7 @@ PanelWindow {
                                 x: 74
                                 y: 16
                                 width: parent.width - x - 18
-                                Lb { width: parent.width; elide: Text.ElideRight; text: `${n.appName || "app"} · ${Notes.ago(n, clock.date.getTime())}`; px: 11 }
+                                Lb { width: parent.width; elide: Text.ElideRight; text: `[ ORIGIN: ${(n.appName || "SYSTEM").toUpperCase()} ] // ${Notes.ago(n, clock.date.getTime())}`; px: 10 }
                                 Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: n.summary; font { family: Theme.ui; pixelSize: 15; weight: Font.DemiBold } color: Theme.fg }
                                 Text {
                                     width: parent.width
@@ -200,7 +201,7 @@ PanelWindow {
                             spacing: 8
                             Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
                             Text {
-                                text: "[ NERV TACTICAL CONTROL // SYSTEM BUS 01 ]"
+                                text: "■ 特務機関 NERV // 第１発令所 作戦統制コンソール // TACTICAL BUS 01"
                                 font.family: Theme.mono
                                 font.pixelSize: 10
                                 font.bold: true
@@ -325,8 +326,8 @@ PanelWindow {
                     Rec { width: parent.width; visible: root.pick === "rec"; onTouched: root.pin(); onStart: { root.close(); Sys.toggleRec(); } }
                     ShaderMenu { width: parent.width; visible: root.pick === "shader"; onTouched: root.pin() }
 
-                    Slider { icon: "\u{F00E0}"; visible: Sys.hasBri; value: Sys.bri; onMoved: v => Sys.setBri(v) }
-                    Slider { icon: Sys.muted ? "\u{F075F}" : "\u{F057E}"; value: Sys.muted ? 0 : Sys.vol; onMoved: v => Sys.setVol(v) }
+                    Slider { icon: "\u{F00E0}"; label: "PHOSPHOR // 画面輝度"; visible: Sys.hasBri; value: Sys.bri; onMoved: v => Sys.setBri(v) }
+                    Slider { icon: Sys.muted ? "\u{F075F}" : "\u{F057E}"; label: "GAIN // 音響利得"; value: Sys.muted ? 0 : Sys.vol; onMoved: v => Sys.setVol(v) }
 
                     // Power profile mode selector
                     Row {
@@ -535,6 +536,7 @@ PanelWindow {
         id: sl
         property real value
         property string icon
+        property string label: ""
         signal moved(real v)
         readonly property real shown: area.pressed ? area.v : value
         width: col.width
@@ -560,6 +562,17 @@ PanelWindow {
             color: Theme.accent
             border { width: 1; color: Theme.hazard }
             Icon { x: 16; anchors.verticalCenter: parent.verticalCenter; text: sl.icon; font.pixelSize: 20; color: "#000000" }
+        }
+        Row {
+            x: 48
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !!sl.label
+            spacing: 6
+            Text {
+                text: sl.label
+                font { family: Theme.mono; pixelSize: 9; bold: true; letterSpacing: 0.8 }
+                color: sl.shown > 0.4 ? "#000000" : Theme.chalk
+            }
         }
         Rectangle {
             anchors { right: parent.right; rightMargin: 10; verticalCenter: parent.verticalCenter }

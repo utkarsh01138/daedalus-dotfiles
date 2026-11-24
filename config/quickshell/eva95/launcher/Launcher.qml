@@ -89,7 +89,7 @@ PanelWindow {
         let b;
         if (mode === 1) b = Theme.styles.map(x => ({ head: x.head, items: filter(x.items.map(it => Object.assign({ extra: "", keep: true }, it)), q) })).filter(x => x.items.length);
         else if (mode === 3) b = [];
-        else if (mode === 2) b = [{ head: "windows", sub: String(wins.length), items: filter(wins, q) }];
+        else if (mode === 2) b = [{ head: "ACTIVE BATTLEFIELD WINDOWS // 戦況任務照会", sub: String(wins.length), items: filter(wins, q) }];
         else if (q) {
             const r = filter(apps, q);
             const cmdItems = [];
@@ -114,7 +114,7 @@ PanelWindow {
             b = [];
             if (root.calcOut && !root.calcOut.startsWith("error") && !root.calcOut.includes("failed")) {
                 b.push({
-                    head: "calculation",
+                    head: "BALLISTIC TRAJECTORY // 弾道電算結果",
                     items: [{
                         id: "calc-result",
                         name: root.calcOut,
@@ -129,17 +129,17 @@ PanelWindow {
                 });
             }
             if (cmdItems.length && (rawQ.startsWith(">") || r.length === 0)) {
-                b.push({ head: "commands", items: cmdItems });
+                b.push({ head: "DIRECT KERNEL EXECUTION // 直接命令", items: cmdItems });
             }
             if (r.length) {
-                b.push({ head: "results", sub: String(r.length), items: r });
+                b.push({ head: "MAGI MATCH RESULTS // 検索合致結果", sub: String(r.length), items: r });
             }
             if (cmdItems.length && !rawQ.startsWith(">") && r.length > 0) {
-                b.push({ head: "run as command", items: cmdItems });
+                b.push({ head: "FALLBACK DIRECT RUN // 代替実行", items: cmdItems });
             }
         } else {
             const recent = apps.filter(a => uses[a.id]).sort((a, b) => uses[b.id] - uses[a.id]).slice(0, 6);
-            b = (recent.length ? [{ head: "recent", items: recent }] : []).concat([{ head: "all apps", sub: String(apps.length), all: true, items: apps }]);
+            b = (recent.length ? [{ head: "PRIORITY ARSENAL // 頻用兵装", items: recent }] : []).concat([{ head: "NERV OPERATIONAL PROTOCOLS // 全装備一覧", sub: String(apps.length), all: true, items: apps }]);
         }
         let row = 0, k = 0;
         for (const x of b) {
@@ -244,12 +244,12 @@ PanelWindow {
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    WlrLayershell.namespace: "glyph-launcher"
+    WlrLayershell.namespace: "eva95-launcher"
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.scrim
-        opacity: root.t
+        color: "#000000"
+        opacity: 0.22 * root.t
         MouseArea { anchors.fill: parent; onClicked: root.close() }
     }
 
@@ -278,29 +278,28 @@ PanelWindow {
             Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 14; height: 3; color: Theme.hazard }
             Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 3; height: 14; color: Theme.hazard }
 
-            // Classification header banner: authentic NERV terminal warning
+            // Classification header banner: authentic 1995 NERV terminal warning
             Rectangle {
                 id: banner
                 x: 2
                 y: 2
                 width: parent.width - 4
                 height: 28
-                color: Theme.s2
-                border { width: 1; color: Theme.line }
+                color: Theme.accent
 
                 Row {
                     anchors.centerIn: parent
                     spacing: 12
-                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: "#08080A" }
                     Text {
-                        text: "[ RESTRICTED // NERV INTERNAL DISPATCH // MAGI-01 ]"
+                        text: "■ 特務機関 NERV // 第１発令所 端末 // CENTRAL DOGMA PROGRAM LAUNCHER"
                         font.family: Theme.mono
                         font.pixelSize: 11
                         font.bold: true
                         font.letterSpacing: 1.5
-                        color: Theme.hazard
+                        color: "#08080A"
                     }
-                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: Theme.crimson }
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: "#08080A" }
                 }
             }
 
@@ -322,9 +321,9 @@ PanelWindow {
                     spacing: 6
                     Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: Theme.accent }
                     Text {
-                        text: "EXEC >"
+                        text: "MAGI-01 // EXEC >"
                         font.family: Theme.mono
-                        font.pixelSize: 14
+                        font.pixelSize: 13
                         font.bold: true
                         color: Theme.accent
                     }
@@ -345,7 +344,12 @@ PanelWindow {
                     Text {
                         visible: !input.text
                         x: 6
-                        text: ["ACCESS TELEMETRY / APPS...", "SELECT COLORWAY DOSSIER...", "SURFACE ACTIVE THREAD...", "CALCULATE TRAJECTORY / EQUATION..."][root.mode]
+                        text: [
+                            "NERV DATABASE // MAGI ARCHIVE QUERY // LEVEL-A CLEARANCE...",
+                            "VISUAL SCHEMATICS // MAGI THEME DOSSIER [意匠設定]...",
+                            "TERMINAL DOGMA ACTIVE THREADS // WINDOW QUERY [任務照会]...",
+                            "TACTICAL BALLISTIC TRAJECTORY COMPUTATION [弾道電算]..."
+                        ][root.mode]
                         font: input.font
                         color: Theme.mute
                     }
@@ -377,7 +381,7 @@ PanelWindow {
                             radius: 0
                             color: root.mode === index ? Theme.accent : Theme.s1
                             border { width: 1; color: root.mode === index ? Theme.hazard : Theme.line }
-                            Lb { id: chip; anchors.centerIn: parent; text: parent.modelData.toUpperCase(); px: 9; color: root.mode === parent.index ? "#000000" : Theme.chalk }
+                            Lb { id: chip; anchors.centerIn: parent; text: ["01: APPS [兵装]", "02: STYLE [意匠]", "03: WINDOWS [任務]", "04: CALC [電算]"][parent.index]; px: 9; color: root.mode === parent.index ? "#000000" : Theme.chalk }
                             TapHandler { onTapped: { root.mode = parent.index; input.forceActiveFocus(); } }
                         }
                     }
@@ -570,12 +574,12 @@ PanelWindow {
                 sourceSize: Qt.size(44, 44)
                 asynchronous: true
                 retainWhileLoading: true
-                layer.enabled: true
+                layer.enabled: cell.near
                 layer.effect: MultiEffect {
-                    colorization: 1.0
-                    colorizationColor: cell.on ? Theme.hazard : Theme.crimson
-                    brightness: cell.on ? 0.15 : -0.05
-                    contrast: 0.25
+                    colorization: cell.on ? 1.0 : 0.85
+                    colorizationColor: cell.on ? Theme.accent : Theme.amber
+                    brightness: cell.on ? 0.20 : 0.05
+                    contrast: 0.30
                 }
             }
             TapHandler { onTapped: { root.sel = cell.modelData.k; root.launch(); } }

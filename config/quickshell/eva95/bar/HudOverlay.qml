@@ -3,8 +3,18 @@ import Quickshell
 import Quickshell.Wayland
 import qs
 
-// NERV Tactical HUD Screen Framing & Corner Reticles:
-// Renders authentic Evangelion targeting crosses, coordinate axes, and classification tape on desktop layer
+// =============================================================================
+// EVA-95 CENTRAL DOGMA TACTICAL HUD SCREEN FRAMING & TELECINE MASTER OVERLAY
+// =============================================================================
+// Faithful 1995 Neon Genesis Evangelion Hideaki Anno / Gainax Telecine Aesthetic:
+// - Optical coordinate rulers along X and Y axes framing the central viewport
+// - 24fps SMPTE production timecode counter with blinking REC tally
+// - Subterranean Geofront atmospheric readouts (Barometric pressure, temperature, micro-seismic activity)
+// - Tactical target acquisition envelope with azimuth, elevation, and Doppler telemetry
+// - Bottom teletype status marquee for Central Dogma bulkheads & MAGI state
+// - Sits EXCLUSIVELY in the central 1160px viewport (between x: 380 and 1540), completely avoiding
+//   any overlap with the Left and Right Flank operational consoles.
+// - 100% click-through (mask: Region {}) so desktop clicks are never intercepted
 PanelWindow {
     id: root
 
@@ -17,37 +27,49 @@ PanelWindow {
     // Empty input mask: guarantees 100% click-through for desktop clicks and interactions
     mask: Region {}
 
-    readonly property color hudColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.9) : Qt.rgba(0.9, 0.11, 0.14, 0.75)
-    readonly property color hudSubColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.75) : Qt.rgba(0.9, 0.11, 0.14, 0.65)
-    readonly property color hexColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.35) : Qt.rgba(0.9, 0.11, 0.14, 0.25)
-    readonly property color ringColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.25) : Qt.rgba(0.9, 0.11, 0.14, 0.18)
-    readonly property bool larp: Theme.state.larp ?? false
+    readonly property color hudColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.9) : Qt.rgba(1.0, 0.55, 0.0, 0.85)
+    readonly property color hudSubColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.75) : Qt.rgba(1.0, 0.55, 0.0, 0.65)
+    readonly property color hexColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.35) : Qt.rgba(1.0, 0.55, 0.0, 0.30)
+    readonly property color ringColor: Theme.isLightWall ? Qt.rgba(0.05, 0.05, 0.08, 0.25) : Qt.rgba(1.0, 0.55, 0.0, 0.20)
+    readonly property bool larp: Theme.state.larp ?? true
+
+    SystemClock { id: clock; precision: SystemClock.Seconds }
+
+    // Live 24fps Production Film / Broadcast Frame Counter (00..23)
+    property int frame: 0
+    Timer {
+        interval: 41
+        running: true
+        repeat: true
+        onTriggered: root.frame = (root.frame + 1) % 24
+    }
 
     Item {
         anchors.fill: parent
+        visible: root.larp
 
         // Corner Targeting Reticles
         component Reticle: Item {
             property bool flipX: false
             property bool flipY: false
-            width: 48
-            height: 48
+            width: 36
+            height: 36
 
             // Horizontal crossline
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 x: flipX ? parent.width - width : 0
-                width: 32
+                width: 24
                 height: 1
-                color: Theme.crimson
+                color: Theme.amber
             }
             // Vertical crossline
             Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: flipY ? parent.height - height : 0
                 width: 1
-                height: 32
-                color: Theme.crimson
+                height: 24
+                color: Theme.amber
             }
             // Corner angle bracket
             Rectangle {
@@ -70,170 +92,322 @@ PanelWindow {
             }
         }
 
-        // Top Left Reticle & Tactical Identification
-        Reticle { x: 12; y: 46 }
+        // =====================================================================
+        // CENTRAL VIEWPORT TELECINE FRAMING (Cleanly bounded inside x: 385..1535)
+        // =====================================================================
+
+        // Top Left of Central Viewport: Reticle & 24fps Telecine Recording Timecode
+        Reticle { x: 386; y: 46 }
         Row {
-            x: 52
-            y: 52
+            x: 426
+            y: 50
             spacing: 8
-            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 10; color: Theme.crimson }
+
+            // Flashing REC indicator
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 7
+                height: 7
+                radius: 4
+                color: Theme.red
+                SequentialAnimation on opacity {
+                    running: true
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 1.0; to: 0.15; duration: 500 }
+                    NumberAnimation { from: 0.15; to: 1.0; duration: 500 }
+                }
+            }
             Text {
-                text: "NERV TACTICAL HUD // TERMINAL HAL-16X // DISP 01"
-                font.family: Theme.mono
-                font.pixelSize: 9
-                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+                text: `REC ● [${Qt.formatTime(clock.date, "hh:mm:ss")}:${root.frame < 10 ? "0" : ""}${root.frame}]`
+                font { family: Theme.mono; pixelSize: 9; bold: true }
+                color: Theme.red
+            }
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 1; height: 10; color: Theme.s3 }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "CAM-01 [CENTRAL DOGMA] // NTSC-J"
+                font { family: Theme.mono; pixelSize: 8; bold: true; letterSpacing: 0.8 }
                 color: root.hudColor
-                font.letterSpacing: 1.2
             }
         }
 
-        // Top Right Reticle & Security Classification
-        Reticle { anchors.right: parent.right; anchors.rightMargin: 12; y: 46; flipX: true }
+        // Top Right of Central Viewport: Remaster Digital Master Marker & Reticle
+        Reticle { x: 1534 - 36; y: 46; flipX: true }
         Row {
             anchors.right: parent.right
-            anchors.rightMargin: 52
-            y: 52
+            anchors.rightMargin: 395
+            y: 50
             spacing: 8
             Text {
-                text: "RESTRICTED ACCESS // LEVEL-A CLEARANCE // MAGI OVERRIDE 666"
-                font.family: Theme.mono
-                font.pixelSize: 9
-                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+                text: "DIGITAL REMASTER // 1080p TELECINE // MAGI-01"
+                font { family: Theme.mono; pixelSize: 8; bold: true; letterSpacing: 0.8 }
                 color: root.hudColor
-                font.letterSpacing: 1.2
             }
-            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 10; color: Theme.hazard }
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 8; color: Theme.hazard }
         }
 
-        // Bottom Left Reticle & Telemetry Coordinates
-        Reticle { x: 12; anchors.bottom: parent.bottom; anchors.bottomMargin: 12; flipY: true }
+        // Bottom Left of Central Viewport: Reticle & Telemetry Coordinates
+        Reticle { x: 386; anchors.bottom: parent.bottom; anchors.bottomMargin: 32; flipY: true }
         Row {
-            x: 52
+            x: 426
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 16
-            spacing: 8
-            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 10; color: Theme.crimson }
+            anchors.bottomMargin: 36
+            spacing: 6
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 8; color: Theme.amber }
             Text {
-                text: "POS: 35°14'45\"N 139°01'22\"E // GEOFRONT TOKYO-3 // B22F CENTRAL DOGMA"
-                font.family: Theme.mono
-                font.pixelSize: 9
-                font.bold: true
+                text: "POS: 35°14'45\"N 139°01'22\"E // GEOFRONT TOKYO-3 // B322F"
+                font { family: Theme.mono; pixelSize: 8; bold: true; letterSpacing: 0.8 }
                 color: root.hudSubColor
-                font.letterSpacing: 1.2
             }
         }
 
-        // Bottom Right Reticle & MAGI Tri-Cluster State
-        Reticle { anchors.right: parent.right; anchors.rightMargin: 12; anchors.bottom: parent.bottom; anchors.bottomMargin: 12; flipX: true; flipY: true }
+        // Bottom Right of Central Viewport: Reticle & MAGI Tri-Cluster State
+        Reticle { x: 1534 - 36; anchors.bottom: parent.bottom; anchors.bottomMargin: 32; flipX: true; flipY: true }
         Row {
             anchors.right: parent.right
-            anchors.rightMargin: 52
+            anchors.rightMargin: 395
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 16
-            spacing: 8
+            anchors.bottomMargin: 36
+            spacing: 6
             Text {
-                text: "SYNC RATIO: 99.8% // AT-FIELD: DEPLOYED // MAGI BUS: NOMINAL"
-                font.family: Theme.mono
-                font.pixelSize: 9
-                font.bold: true
+                text: "SYNC: 89.89% // AT-FIELD: DEPLOYED // MAGI BUS: NOMINAL"
+                font { family: Theme.mono; pixelSize: 8; bold: true; letterSpacing: 0.8 }
                 color: root.hudSubColor
-                font.letterSpacing: 1.2
             }
-            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 10; color: Theme.crimson }
+            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 8; color: Theme.phosphor }
         }
 
-        // Left Edge Hexadecimal Memory Offsets
-        Column {
-            x: 14
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 24
+        // =====================================================================
+        // VIEWPORT OPTICAL COORDINATE RULERS (Y-AXIS RULERS FRAMING VIEWPORT)
+        // =====================================================================
+        // Left Flank Inner Boundary Ruler (x: 385, bracketing Left Flank)
+        Item {
+            x: 385
+            y: 50
+            width: 30
+            height: parent.height - 100
+
+            // Continuous vertical datum hairline
+            Rectangle {
+                x: 0
+                y: 0
+                width: 1
+                height: parent.height
+                color: root.hexColor
+            }
+
+            // Ticks and labels every 100 pixels
             Repeater {
-                model: ["0x7FFF00", "0x7FFF20", "0x7FFF40", "0x7FFF60", "0x7FFF80", "0x7FFFA0", "0x7FFFC0"]
-                Text {
-                    required property string modelData
-                    text: modelData
-                    font.family: Theme.mono
-                    font.pixelSize: 8
-                    color: root.hexColor
+                model: 11
+                Item {
+                    required property int index
+                    x: 0
+                    y: index * 100
+                    width: 30
+                    height: 12
+
+                    // Major horizontal tick
+                    Rectangle {
+                        x: 0
+                        y: 0
+                        width: 6
+                        height: 1
+                        color: Theme.hazard
+                    }
+                    // Minor horizontal tick at +50px
+                    Rectangle {
+                        x: 0
+                        y: 50
+                        width: 3
+                        height: 1
+                        color: root.hexColor
+                    }
+                    Text {
+                        x: 8
+                        y: -5
+                        text: `+${String(index * 100).padStart(4, "0")}`
+                        font { family: Theme.mono; pixelSize: 8 }
+                        color: root.hexColor
+                    }
                 }
             }
         }
 
-        // Right Edge Hexadecimal Memory Offsets
-        Column {
-            anchors.right: parent.right
-            anchors.rightMargin: 14
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 24
+        // Right Flank Inner Boundary Ruler (x: 1535, bracketing Right Flank)
+        Item {
+            x: 1535
+            y: 50
+            width: 30
+            height: parent.height - 100
+
+            // Continuous vertical datum hairline
+            Rectangle {
+                x: 0
+                y: 0
+                width: 1
+                height: parent.height
+                color: root.hexColor
+            }
+
+            // Ticks and labels every 100 pixels
             Repeater {
-                model: ["0x8FFF00", "0x8FFF20", "0x8FFF40", "0x8FFF60", "0x8FFF80", "0x8FFFA0", "0x8FFFC0"]
-                Text {
-                    required property string modelData
-                    text: modelData
-                    font.family: Theme.mono
-                    font.pixelSize: 8
-                    color: root.hexColor
+                model: 11
+                Item {
+                    required property int index
+                    x: -24
+                    y: index * 100
+                    width: 30
+                    height: 12
+
+                    // Major horizontal tick
+                    Rectangle {
+                        x: 24
+                        y: 0
+                        width: 6
+                        height: 1
+                        color: Theme.hazard
+                    }
+                    // Minor horizontal tick at +50px
+                    Rectangle {
+                        x: 24
+                        y: 50
+                        width: 3
+                        height: 1
+                        color: root.hexColor
+                    }
+                    Text {
+                        x: -10
+                        y: -5
+                        text: `-${String(index * 100).padStart(4, "0")}`
+                        font { family: Theme.mono; pixelSize: 8 }
+                        color: root.hexColor
+                    }
                 }
             }
         }
 
-        // LARP Combat Status Banner
+        // =====================================================================
+        // VIEWPORT OPTICAL COORDINATE RULERS (X-AXIS RULERS TOP & BOTTOM)
+        // =====================================================================
+        // Top Horizontal Coordinate Line (y: 44, between x: 390 and 1530)
+        Item {
+            x: 390
+            y: 44
+            width: 1140
+            height: 16
+
+            Rectangle {
+                anchors.top: parent.top
+                width: parent.width
+                height: 1
+                color: root.hexColor
+            }
+
+            Repeater {
+                model: [400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500]
+                Item {
+                    required property int modelData
+                    x: (modelData - 400) * (1140 / 1100)
+                    y: 0
+                    Rectangle { width: 1; height: 4; color: Theme.hazard }
+                    Text {
+                        x: -12
+                        y: 5
+                        text: String(modelData)
+                        font { family: Theme.mono; pixelSize: 7 }
+                        color: root.hexColor
+                    }
+                }
+            }
+        }
+
+        // =====================================================================
+        // SUBTERRANEAN GEOFRONT SENSOR PILL (TOP CENTER: y: 48)
+        // =====================================================================
         Rectangle {
-            visible: root.larp
             anchors.horizontalCenter: parent.horizontalCenter
             y: 48
-            width: 460
-            height: 22
+            width: geoRow.width + 16
+            height: 18
             radius: 0
-            color: Theme.accent
-            border { width: 1; color: Theme.hazard }
+            color: Qt.rgba(0.06, 0.05, 0.04, 0.82)
+            border { width: 1; color: Qt.rgba(1.0, 0.55, 0.0, 0.4) }
+
             Row {
+                id: geoRow
                 anchors.centerIn: parent
-                spacing: 8
-                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: "#FFFFFF" }
-                Text {
-                    text: "EMERGENCY // ANGEL DETECTED: CODE BLUE // OVERRIDE ACTIVE"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.bold: true
-                    font.letterSpacing: 1.2
-                    color: "#FFFFFF"
+                spacing: 10
+
+                Row {
+                    spacing: 4
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.phosphor }
+                    Text { text: "ジオフロント 気圧: 1013.25 hPa"; font { family: Theme.mono; pixelSize: 8; bold: true } color: Theme.chalk }
                 }
-                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 6; height: 6; color: "#FFFFFF" }
-            }
-            SequentialAnimation on opacity {
-                running: root.larp
-                loops: Animation.Infinite
-                NumberAnimation { from: 1.0; to: 0.25; duration: 500 }
-                NumberAnimation { from: 0.25; to: 1.0; duration: 500 }
+                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 1; height: 10; color: Theme.s3 }
+                Row {
+                    spacing: 4
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.hazard }
+                    Text { text: "地下気温: 19.8°C"; font { family: Theme.mono; pixelSize: 8; bold: true } color: Theme.chalk }
+                }
+                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 1; height: 10; color: Theme.s3 }
+                Row {
+                    spacing: 4
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.phosphor }
+                    Text { text: "地殻変動率: 0.002 gal"; font { family: Theme.mono; pixelSize: 8; bold: true } color: Theme.chalk }
+                }
+                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 1; height: 10; color: Theme.s3 }
+                Row {
+                    spacing: 4
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.cyan }
+                    Text { text: "LCL純度: 99.98%"; font { family: Theme.mono; pixelSize: 8; bold: true } color: Theme.chalk }
+                }
+                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 1; height: 10; color: Theme.s3 }
+                Row {
+                    spacing: 4
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.phosphor }
+                    Text { text: "MAGI-01: 正常稼働"; font { family: Theme.mono; pixelSize: 8; bold: true } color: Theme.phosphor }
+                }
             }
         }
 
-        // LARP: Authentic Evangelion AT-Field (Absolute Terror Field)
+        // =====================================================================
+        // AUTHENTIC EVANGELION AT-FIELD (ABSOLUTE TERROR FIELD) - TRANSPARENT
+        // =====================================================================
         Item {
             id: atField
             visible: root.larp
             anchors.centerIn: parent
-            width: 500
-            height: 500
+            width: 480
+            height: 480
+
+            // Target Acquisition Envelope Callout (Above AT-Field)
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: -36
+                text: "【 目標識別: 使徒 (PATTERNS: BLOOD-TYPE BLUE) // CODE: 601 】"
+                font { family: Theme.eva; pixelSize: 10; bold: true; letterSpacing: 1.1 }
+                color: Theme.amber
+            }
 
             // Radiating Phase Wave 1
             Image {
                 anchors.centerIn: parent
-                width: 480
-                height: 480
+                width: 460
+                height: 460
                 sourceSize: Qt.size(width, height)
                 source: Qt.resolvedUrl("atfield_pulse.svg")
                 NumberAnimation on scale {
                     running: root.larp
                     from: 0.6
-                    to: 1.5
+                    to: 1.45
                     duration: 2200
                     loops: Animation.Infinite
                 }
                 NumberAnimation on opacity {
                     running: root.larp
-                    from: 0.9
+                    from: 0.85
                     to: 0.0
                     duration: 2200
                     loops: Animation.Infinite
@@ -243,8 +417,8 @@ PanelWindow {
             // Radiating Phase Wave 2 (offset)
             Image {
                 anchors.centerIn: parent
-                width: 480
-                height: 480
+                width: 460
+                height: 460
                 sourceSize: Qt.size(width, height)
                 source: Qt.resolvedUrl("atfield_pulse.svg")
                 SequentialAnimation {
@@ -252,17 +426,17 @@ PanelWindow {
                     loops: Animation.Infinite
                     PauseAnimation { duration: 1100 }
                     ParallelAnimation {
-                        NumberAnimation { property: "scale"; from: 0.6; to: 1.5; duration: 2200 }
-                        NumberAnimation { property: "opacity"; from: 0.9; to: 0.0; duration: 2200 }
+                        NumberAnimation { property: "scale"; from: 0.6; to: 1.45; duration: 2200 }
+                        NumberAnimation { property: "opacity"; from: 0.85; to: 0.0; duration: 2200 }
                     }
                 }
             }
 
-            // Core Concentric Octagons
+            // Core Concentric Octagons (Clean vector wireframe, fill="none")
             Image {
                 anchors.centerIn: parent
-                width: 380
-                height: 380
+                width: 360
+                height: 360
                 sourceSize: Qt.size(width, height)
                 source: Qt.resolvedUrl("atfield.svg")
                 opacity: 0.85
@@ -275,8 +449,8 @@ PanelWindow {
             }
             Image {
                 anchors.centerIn: parent
-                width: 260
-                height: 260
+                width: 250
+                height: 250
                 sourceSize: Qt.size(width, height)
                 source: Qt.resolvedUrl("atfield.svg")
                 opacity: 0.95
@@ -288,30 +462,23 @@ PanelWindow {
                 }
             }
 
-            // Center Phase Status Label
-            Rectangle {
-                anchors.centerIn: parent
-                width: 260
-                height: 20
-                radius: 0
-                color: Qt.rgba(0.05, 0.05, 0.08, 0.85)
-                border { width: 1; color: Theme.hazard }
-                Text {
-                    anchors.centerIn: parent
-                    text: "AT-FIELD // PHASE: 432.8 THz [ACTIVE]"
-                    font { family: Theme.mono; pixelSize: 9; bold: true; letterSpacing: 1.1 }
-                    color: Theme.hazard
-                }
+            // Target Telemetry Callout (Below AT-Field)
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: parent.height + 22
+                text: "AZIMUTH: 184.22° // ELEVATION: -14.05° // RANGE: 0420m // DOPPLER: +0.02c"
+                font { family: Theme.mono; pixelSize: 9; bold: true; letterSpacing: 1.2 }
+                color: Theme.hazard
             }
         }
 
-        // Center Target Lock Ring Framing
+        // Center Target Lock Ring & Delicate Radar Sweep
         Item {
             anchors.centerIn: parent
-            width: 380
-            height: 380
+            width: 360
+            height: 360
 
-            // LARP: Sweeping Radar Beam
+            // Sweeping Radar Beam (Low opacity 0.35 so Lilith remains pristine)
             Item {
                 visible: root.larp
                 anchors.centerIn: parent
@@ -321,90 +488,82 @@ PanelWindow {
                     x: parent.width / 2
                     y: parent.height / 2
                     width: parent.width / 2
-                    height: 2
+                    height: 1.5
                     color: Theme.hazard
-                    opacity: 0.7
-                }
-                RotationAnimation on rotation {
-                    running: root.larp
-                    from: 0
-                    to: 360
-                    duration: 3500
-                    loops: Animation.Infinite
+                    opacity: 0.35
+                    transformOrigin: Item.TopLeft
+                    RotationAnimation on rotation {
+                        running: root.larp
+                        loops: Animation.Infinite
+                        from: 0
+                        to: 360
+                        duration: 6000
+                    }
                 }
             }
 
-            // LARP: Inner Counter-Rotating Reticle Ring
-            Item {
-                visible: root.larp
+            // Radar Ring Outer Ticks
+            Rectangle {
                 anchors.centerIn: parent
-                width: 240
-                height: 240
-                Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "transparent"
-                    border { width: 1; color: Theme.hazard }
-                    opacity: 0.4
-                }
-                // 4 inner reticle ticks
-                Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 14; height: 2; color: Theme.hazard }
-                Rectangle { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; width: 14; height: 2; color: Theme.hazard }
-                Rectangle { anchors.top: parent.top; anchors.horizontalCenter: parent.horizontalCenter; width: 2; height: 14; color: Theme.hazard }
-                Rectangle { anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; width: 2; height: 14; color: Theme.hazard }
-
-                RotationAnimation on rotation {
-                    running: root.larp
-                    from: 360
-                    to: 0
-                    duration: 20000
-                    loops: Animation.Infinite
+                width: parent.width
+                height: parent.height
+                radius: width / 2
+                color: "transparent"
+                border {
+                    width: 1
+                    color: root.ringColor
                 }
             }
 
-            // Main Rotating reticle ring
-            Item {
-                anchors.fill: parent
+            // Rangefinder crosshair lines
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width + 40
+                height: 1
+                color: root.ringColor
+            }
+            Rectangle {
+                anchors.centerIn: parent
+                width: 1
+                height: parent.height + 40
+                color: root.ringColor
+            }
+        }
+
+        // =====================================================================
+        // BOTTOM TELETYPE TACTICAL MARQUEE BAR (y: parent.height - 18)
+        // =====================================================================
+        Rectangle {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+            width: 1140
+            height: 18
+            radius: 0
+            color: Qt.rgba(0.06, 0.05, 0.04, 0.85)
+            border { width: 1; color: Qt.rgba(1.0, 0.55, 0.0, 0.4) }
+
+            Row {
+                anchors.centerIn: parent
+                spacing: 8
+
                 Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "transparent"
-                    border { width: 1; color: root.ringColor }
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 5
+                    height: 5
+                    color: Theme.hazard
+                    SequentialAnimation on opacity {
+                        running: true
+                        loops: Animation.Infinite
+                        NumberAnimation { from: 1.0; to: 0.2; duration: 400 }
+                        NumberAnimation { from: 0.2; to: 1.0; duration: 400 }
+                    }
                 }
-
-                // Range and azimuth stamping
                 Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    y: -18
-                    text: "TARGET ACQUISITION // RNG: 0420m // AZM: 184.2°"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.bold: true
-                    color: root.hudSubColor
-                    font.letterSpacing: 1.2
-                }
-
-                // Target cross tick lines
-                Rectangle { anchors.left: parent.left; anchors.leftMargin: -12; anchors.verticalCenter: parent.verticalCenter; width: 24; height: 1; color: root.hudSubColor }
-                Rectangle { anchors.right: parent.right; anchors.rightMargin: -12; anchors.verticalCenter: parent.verticalCenter; width: 24; height: 1; color: root.hudSubColor }
-                Rectangle { anchors.top: parent.top; anchors.topMargin: -12; anchors.horizontalCenter: parent.horizontalCenter; width: 1; height: 24; color: root.hudSubColor }
-                Rectangle { anchors.bottom: parent.bottom; anchors.bottomMargin: -12; anchors.horizontalCenter: parent.horizontalCenter; width: 1; height: 24; color: root.hudSubColor }
-
-                // Outer 4 corner brackets
-                Rectangle { x: 40; y: 40; width: 16; height: 1; color: root.hudSubColor }
-                Rectangle { x: 40; y: 40; width: 1; height: 16; color: root.hudSubColor }
-                Rectangle { anchors.right: parent.right; anchors.rightMargin: 40; y: 40; width: 16; height: 1; color: root.hudSubColor }
-                Rectangle { anchors.right: parent.right; anchors.rightMargin: 40; y: 40; width: 1; height: 16; color: root.hudSubColor }
-                Rectangle { x: 40; anchors.bottom: parent.bottom; anchors.bottomMargin: 40; width: 16; height: 1; color: root.hudSubColor }
-                Rectangle { x: 40; anchors.bottom: parent.bottom; anchors.bottomMargin: 40; width: 1; height: 16; color: root.hudSubColor }
-                Rectangle { anchors.right: parent.right; anchors.rightMargin: 40; anchors.bottom: parent.bottom; anchors.bottomMargin: 40; width: 16; height: 1; color: root.hudSubColor }
-                Rectangle { anchors.right: parent.right; anchors.rightMargin: 40; anchors.bottom: parent.bottom; anchors.bottomMargin: 40; width: 1; height: 16; color: root.hudSubColor }
-
-                RotationAnimation on rotation {
-                    from: 0
-                    to: 360
-                    duration: 120000
-                    loops: Animation.Infinite
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "NERV HQ TOKYO-3 // B322F CENTRAL DOGMA // DEFENSE BULKHEADS NO.01-NO.24: LOCKED // MAGI-01 NOMINAL // AT-FIELD ACTIVE // \"GOD'S IN HIS HEAVEN, ALL'S RIGHT WITH THE WORLD.\""
+                    font { family: Theme.mono; pixelSize: 8; bold: true; letterSpacing: 1.1 }
+                    color: Theme.chalk
                 }
             }
         }

@@ -1,5 +1,5 @@
 <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-  <!-- Glowing Shockwave Octagon Ring -->
-  <polygon points="471.73,341.84 341.84,471.73 158.16,471.73 28.27,341.84 28.27,158.16 158.16,28.27 341.84,28.27 471.73,158.16" fill="none" stroke="#FF3B43" stroke-width="4"/>
-  <polygon points="434.78,326.54 326.54,434.78 173.46,434.78 65.22,326.54 65.22,173.46 173.46,65.22 326.54,65.22 434.78,173.46" fill="none" stroke="#FF3B43" stroke-width="2" stroke-dasharray="12,6"/>
+  <!-- Glowing Amber Shockwave Octagon Ring -->
+  <polygon points="471.73,341.84 341.84,471.73 158.16,471.73 28.27,341.84 28.27,158.16 158.16,28.27 341.84,28.27 471.73,158.16" fill="none" stroke="#FFAA00" stroke-width="4"/>
+  <polygon points="434.78,326.54 326.54,434.78 173.46,434.78 65.22,326.54 65.22,173.46 173.46,65.22 326.54,65.22 434.78,173.46" fill="none" stroke="#FF8800" stroke-width="2" stroke-dasharray="12,6"/>
 </svg>

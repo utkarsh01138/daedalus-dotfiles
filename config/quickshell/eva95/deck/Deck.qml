@@ -25,9 +25,10 @@ Scope {
     readonly property var ids: Theme.state.deck.filter(id => Theme.decks.includes(id))
     readonly property int h: 232 // Section height in layout pixels
 
-    // When open, enable detailed polling for CPU/memory/network stats
+    // When open, enable detailed polling for CPU/memory/network stats & Cava audio visualizer
     Binding { target: Sys; property: "deckOpen"; value: root.on !== null }
     Binding { target: SysStats; property: "perf"; value: root.on !== null }
+    Binding { target: Cava; property: "active"; value: root.on !== null && Media.playing }
 
     SystemClock { id: clock; precision: SystemClock.Minutes }
     readonly property var en: Qt.locale("en_US")
@@ -61,7 +62,7 @@ Scope {
             color: "transparent"
             // Closed: Top layer (Glyph progress bar on edge); Open: Overlay layer (visible over fullscreen windows)
             WlrLayershell.layer: t > 0 ? WlrLayer.Overlay : WlrLayer.Top
-            WlrLayershell.namespace: "glyph-deck"
+            WlrLayershell.namespace: "eva95-deck"
             mask: Region {
                 y: win.open ? 0 : win.height - 4
                 width: win.width
@@ -71,11 +72,11 @@ Scope {
             Timer { id: dwell; interval: 150; onTriggered: root.on = win.modelData }
             Timer { id: leave; interval: 300; onTriggered: if (win.open && !root.pinned) root.on = null }
 
-            // 35% black scrim covers the entire screen, click dismisses deck
+            // 15% subtle warm black scrim covers the entire screen, click dismisses deck
             Rectangle {
                 anchors.fill: parent
                 color: "#000000"
-                opacity: 0.35 * win.t
+                opacity: 0.15 * win.t
                 visible: win.t > 0
                 MouseArea { anchors.fill: parent; onClicked: { root.pinned = false; root.on = null; } }
             }
@@ -115,22 +116,18 @@ Scope {
                     Rectangle {
                         id: deckBanner
                         anchors { top: parent.top; left: parent.left; right: parent.right }
-                        height: 24
-                        color: Theme.s2
-                        border { width: 1; color: Theme.accent }
+                        height: 26
+                        color: Theme.accent
                         Row {
                             anchors.centerIn: parent
                             spacing: 8
-                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.crimson }
+                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 5; height: 5; color: "#08080A" }
                             Text {
-                                text: "[ NERV TACTICAL DIAGNOSTIC DECK // SYSTEM TELEMETRY // MAGI-01 ]"
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                font.bold: true
-                                font.letterSpacing: 1.2
-                                color: Theme.hazard
+                                text: "■ 特務機関 NERV // 戦術診断コンソール // MAGI-01 TRICLUSTER DECK"
+                                font { family: Theme.mono; pixelSize: 10; bold: true; letterSpacing: 1.2 }
+                                color: "#08080A"
                             }
-                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 4; color: Theme.crimson }
+                            Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 5; height: 5; color: "#08080A" }
                         }
                     }
 
@@ -337,17 +334,42 @@ Scope {
                     Item { width: 1; height: 12 }
                     Row {
                         spacing: 14
-                        Item {
-                            id: art
+                        // Authentic Real-Time CRT Segmented Audio Spectrum Visualizer (Cava)
+                        Rectangle {
                             width: 84
                             height: 84
-                            property real turn: 0
-                            Timer { running: win.open && Media.playing; interval: 33; repeat: true; onTriggered: art.turn = (art.turn + 360 / 14 / 30) % 360 }
-                            Art { anchors.fill: parent; rotation: art.turn; url: Media.player?.trackArtUrl ?? ""; step: 5 }
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "transparent"
-                                border { width: 1; color: Theme.accent }
+                            radius: 0
+                            color: Theme.s2
+                            border { width: 1; color: Media.playing ? Theme.accent : Theme.line }
+
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 3
+                                Repeater {
+                                    model: 8
+                                    Column {
+                                        id: freqCol
+                                        required property int index
+                                        readonly property real val: Math.min(1.0, Math.max(0.0, Cava.bars[index] ?? 0))
+                                        spacing: 2
+                                        Repeater {
+                                            model: 12
+                                            Rectangle {
+                                                id: segRect
+                                                required property int index
+                                                readonly property real thresh: (11 - index) / 12
+                                                readonly property bool lit: Media.playing && freqCol.val > thresh
+                                                width: 7
+                                                height: 4
+                                                radius: 0
+                                                color: lit
+                                                    ? (index < 3 ? Theme.hazard : index < 7 ? Theme.amber : Theme.phosphor)
+                                                    : Theme.s3
+                                                opacity: lit ? 1.0 : 0.25
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         Column {
@@ -358,12 +380,12 @@ Scope {
                                 wrapMode: Text.Wrap
                                 maximumLineCount: 2
                                 elide: Text.ElideRight
-                                text: Media.player?.trackTitle || "Nothing on"
+                                text: Media.player?.trackTitle || "Terminal Dogma Audio"
                                 textFormat: Text.PlainText
-                                font { family: Theme.mono; pixelSize: 14; bold: true }
+                                font { family: Theme.mono; pixelSize: 13; bold: true }
                                 color: Theme.hazard
                             }
-                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackArtist ?? ""; font { family: Theme.mono; pixelSize: 11 } color: Theme.grey }
+                            Text { textFormat: Text.PlainText; width: parent.width; elide: Text.ElideRight; text: Media.player?.trackArtist ?? "MAGI Acoustic Bus"; font { family: Theme.mono; pixelSize: 10 } color: Theme.grey }
                         }
                     }
                     Item { width: 1; height: 16 }
@@ -410,12 +432,24 @@ Scope {
                     // Eva-01 Synchronicity Ratio: dynamically modulated by CPU frequency and load
                     readonly property real synchVal: Math.min(0.999, Math.max(0.680, 0.85 + (SysStats.cpuFreq / 4.4) * 0.10 - SysStats.cpu * 0.08))
 
-                    Lb {
+                    Row {
                         width: parent.width
-                        text: `magi · consensus ${magiCol.consensus}/3`
-                        px: 11
-                        font.bold: true
-                        color: magiCol.consensus === 3 ? Theme.hazard : magiCol.consensus === 2 ? Theme.crimson : Theme.red
+                        spacing: 8
+                        AnimatedImage {
+                            width: 20
+                            height: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            source: Quickshell.shellPath("assets/gifs/opt/ja_fuel_bundle_hex_reactor_2x.gif")
+                            fillMode: Image.PreserveAspectFit
+                            playing: win.open
+                        }
+                        Lb {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: `magi · consensus ${magiCol.consensus}/3`
+                            px: 11
+                            font.bold: true
+                            color: magiCol.consensus === 3 ? Theme.hazard : magiCol.consensus === 2 ? Theme.amber : Theme.red
+                        }
                     }
                     Item { width: 1; height: 8 }
 
@@ -430,18 +464,18 @@ Scope {
                             height: 32
                             radius: 0
                             color: Theme.s2
-                            border { width: 1; color: magiCol.mAgree ? Theme.line : Theme.crimson }
+                            border { width: 1; color: magiCol.mAgree ? Theme.line : Theme.red }
 
                             Row {
                                 anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
                                 spacing: 6
-                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.mAgree ? Theme.accent : Theme.red }
+                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.mAgree ? Theme.phosphor : Theme.red }
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
                                     Text {
                                         text: "MELCHIOR-1 // SCIENTIST"
                                         font { family: Theme.mono; pixelSize: 9; bold: true }
-                                        color: magiCol.mAgree ? Theme.hazard : Theme.red
+                                        color: magiCol.mAgree ? Theme.phosphor : Theme.red
                                     }
                                     Text {
                                         text: magiCol.mSub
@@ -454,7 +488,7 @@ Scope {
                                 anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
                                 text: magiCol.mVote
                                 font { family: Theme.mono; pixelSize: 9; bold: true }
-                                color: magiCol.mAgree ? Theme.hazard : Theme.red
+                                color: magiCol.mAgree ? Theme.phosphor : Theme.red
                             }
                         }
 
@@ -464,18 +498,18 @@ Scope {
                             height: 32
                             radius: 0
                             color: Theme.s2
-                            border { width: 1; color: magiCol.bAgree ? Theme.line : Theme.crimson }
+                            border { width: 1; color: magiCol.bAgree ? Theme.line : Theme.red }
 
                             Row {
                                 anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
                                 spacing: 6
-                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.bAgree ? Theme.accent : Theme.red }
+                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.bAgree ? Theme.phosphor : Theme.red }
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
                                     Text {
                                         text: "BALTHASAR-2 // MOTHER"
                                         font { family: Theme.mono; pixelSize: 9; bold: true }
-                                        color: magiCol.bAgree ? Theme.hazard : Theme.red
+                                        color: magiCol.bAgree ? Theme.phosphor : Theme.red
                                     }
                                     Text {
                                         text: magiCol.bSub
@@ -488,7 +522,7 @@ Scope {
                                 anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
                                 text: magiCol.bVote
                                 font { family: Theme.mono; pixelSize: 9; bold: true }
-                                color: magiCol.bAgree ? Theme.hazard : Theme.red
+                                color: magiCol.bAgree ? Theme.phosphor : Theme.red
                             }
                         }
 
@@ -498,18 +532,18 @@ Scope {
                             height: 32
                             radius: 0
                             color: Theme.s2
-                            border { width: 1; color: magiCol.cAgree ? Theme.line : Theme.crimson }
+                            border { width: 1; color: magiCol.cAgree ? Theme.line : Theme.red }
 
                             Row {
                                 anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
                                 spacing: 6
-                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.cAgree ? Theme.accent : Theme.red }
+                                Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 4; height: 16; color: magiCol.cAgree ? Theme.phosphor : Theme.red }
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
                                     Text {
                                         text: "CASPAR-3 // WOMAN"
                                         font { family: Theme.mono; pixelSize: 9; bold: true }
-                                        color: magiCol.cAgree ? Theme.hazard : Theme.red
+                                        color: magiCol.cAgree ? Theme.phosphor : Theme.red
                                     }
                                     Text {
                                         text: magiCol.cSub
@@ -522,20 +556,29 @@ Scope {
                                 anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
                                 text: magiCol.cVote
                                 font { family: Theme.mono; pixelSize: 9; bold: true }
-                                color: magiCol.cAgree ? Theme.hazard : Theme.red
+                                color: magiCol.cAgree ? Theme.phosphor : Theme.red
                             }
                         }
                     }
 
                     Item { width: 1; height: 10 }
 
-                    // Eva Synch Ratio readout
+                    // Eva Synch Ratio readout with Animated Harmonic Oscilloscope Waveform
                     Rectangle {
                         width: parent.width
-                        height: 56
+                        height: 64
                         radius: 0
                         color: Theme.s2
                         border { width: 1; color: Theme.accent }
+                        clip: true
+
+                        AnimatedImage {
+                            anchors.fill: parent
+                            fillMode: Image.PreserveAspectCrop
+                            source: Quickshell.shellPath("assets/gifs/opt/synch_harmonics_oscilloscope_2x.gif")
+                            opacity: 0.35
+                            playing: win.open
+                        }
 
                         Column {
                             anchors { fill: parent; margins: 6 }
@@ -553,15 +596,15 @@ Scope {
                                     anchors { right: parent.right; verticalCenter: parent.verticalCenter }
                                     text: (magiCol.synchVal * 100).toFixed(1) + "%"
                                     font { family: Theme.mono; pixelSize: 11; bold: true }
-                                    color: Theme.crimson
+                                    color: Theme.amber
                                 }
                             }
                             // Segmented bar for synch
-                            Seg { width: parent.width; height: 6; n: 16; f: magiCol.synchVal; on: Theme.crimson; off: Theme.s3 }
+                            Seg { width: parent.width; height: 6; n: 16; f: magiCol.synchVal; on: Theme.amber; off: Theme.s3 }
                             Text {
                                 text: `HARMONIC DISTORTION: ±0.0${Math.floor(SysStats.cpu * 35 + 8)}% [${SysStats.cpu > 0.8 ? "DRIFT" : "STABLE"}]`
                                 font { family: Theme.mono; pixelSize: 8 }
-                                color: Theme.mute
+                                color: Theme.chalk
                             }
                         }
                     }

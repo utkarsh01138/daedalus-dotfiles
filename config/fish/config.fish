@@ -9,6 +9,19 @@ if status is-interactive
     command -v direnv &> /dev/null && direnv hook fish | source
     command -v zoxide &> /dev/null && zoxide init fish --cmd cd | source
 
+    # Fzf
+    if command -v fzf &> /dev/null
+        fzf --fish | source
+        set -gx FZF_DEFAULT_OPTS "--height=45% --layout=reverse --border --info=inline"
+        if command -v fd &> /dev/null
+            set -gx FZF_DEFAULT_COMMAND "fd --type f --strip-cwd-prefix --hidden --follow --exclude .git"
+            set -gx FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+            set -gx FZF_ALT_C_COMMAND "fd --type d --strip-cwd-prefix --hidden --follow --exclude .git"
+        end
+        if command -v bat &> /dev/null
+            set -gx FZF_CTRL_T_OPTS "--preview 'bat --color=always --style=numbers --line-range=:200 {}'"
+        end
+    end
     # Better ls
     command -v eza &> /dev/null && alias ls='eza --icons --group-directories-first -1'
 

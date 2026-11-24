@@ -21,31 +21,33 @@ Singleton {
     readonly property var pal: make({})
     readonly property bool light: pal.light
 
-    // NERV Tactical Command Palettes
-    // GeoFront Tactical Bunker (Dark Mode): #060608 base, #121216 panel, #E51D24 Evangelion Blood Red, #FF3B43 bright red
-    readonly property var nervDark: ["#060608", "#121216", "#202028", "#32323E", "#787884", "#D8D8DC", "#E51D24"]
-    // NERV Scientific Laboratory Dossier (Light Mode): #F0EFEA base, #E4E3DD card, #0B4F8A cobalt, #CC1824 seal
-    readonly property var nervLight: ["#F0EFEA", "#E4E3DD", "#D8D7CE", "#C8C7C0", "#767570", "#111214", "#CC1824"]
+    // EVA-95 Central Dogma CRT Phosphor Palettes (1995 Neon Genesis Evangelion)
+    // CRT Amber Terminal (Dark Mode): #08080A tube black, #14120E amber chassis, #FF8800 CRT amber, #FFAA00 high beam
+    readonly property var evaDark: ["#08080A", "#14120E", "#221C14", "#382C1E", "#7E6A4C", "#D8B888", "#FF8800"]
+    // CRT Scientific Blueprint / Archival Dossier (Light Mode): #F5EEDC base, #EADEC5 card, #D46200 amber-brown
+    readonly property var evaLight: ["#F5EEDC", "#EADEC5", "#DFD0B0", "#C8B692", "#7E6A4C", "#1A1408", "#D46200"]
     readonly property var greys: pal.c
-    readonly property color bg: greys[0]   // Root background, tactical bunker black
-    readonly property color s1: greys[1]   // Bar, panels, major diagnostic cards
+    readonly property color bg: greys[0]   // Root background, deep CRT tube black
+    readonly property color s1: greys[1]   // Bar, panels, major diagnostic cards (warm amber-tinted CRT surface)
     readonly property color s2: greys[2]   // Secondary surfaces, telemetry tiles
-    readonly property color s3: greys[3]   // Dividers, coordinate lines
-    readonly property color mute: greys[4] // Inactive / dimmed telemetry
-    readonly property color grey: greys[5] // Secondary metadata text, technical labels
-    readonly property color fg: greys[6]   // Primary tactical telemetry (Evangelion Blood Crimson #E51D24)
+    readonly property color s3: greys[3]   // Dividers, scanline coordinate hairline
+    readonly property color mute: greys[4] // Inactive / dimmed amber telemetry
+    readonly property color grey: greys[5] // Secondary metadata text, warm amber-tan labels
+    readonly property color fg: greys[6]   // Primary tactical telemetry (1995 CRT Phosphor Amber #FF8800)
     readonly property color ink: light ? s1 : bg // Text on high-contrast active tiles
-    readonly property color accent: pal.accent // Evangelion Blood Crimson (#E51D24)
-    readonly property color red: pal.red       // Critical Alert Crimson (#E51D24)
-    readonly property color line: s3       // Border & coordinate hairline
-    readonly property color amber: "#E51D24" // Overridden to Crimson
-    readonly property color bloodRed: "#E51D24"
-    readonly property color crimson: "#E51D24"
-    readonly property color hazard: "#FF3B43"
-    readonly property color cyan: "#00E5FF"
-    readonly property color chalk: "#EAEAEB"
-    readonly property color glow: light ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(0.9, 0.11, 0.14, 0.5)
-    readonly property color scrim: fade(bg, light ? 0.8 : 0.82)
+    readonly property color accent: pal.accent // High-beam phosphor amber (#FFAA00)
+    readonly property color red: pal.red       // Critical Alert Red (#FF2200)
+    readonly property color line: s3       // Border & coordinate scanline hairline
+    readonly property color amber: "#FF8800" // Authentic 1995 CRT Phosphor Amber
+    readonly property color phosphor: "#00FF66" // Authentic CRT Phosphor Mint Green
+    readonly property color phosphorGreen: "#00FF66"
+    readonly property color bloodRed: "#FF2200"
+    readonly property color crimson: "#FF2200"
+    readonly property color hazard: "#FF8800"
+    readonly property color cyan: "#00FFFF"
+    readonly property color chalk: "#FFF4E0" // Warm amber-tinted CRT beam white
+    readonly property color glow: light ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(1.0, 0.55, 0.0, 0.45) // Amber phosphor glow
+    readonly property color scrim: fade(bg, light ? 0.8 : 0.85)
 
     // Wallpaper-specific profile detection (adaptive contrast for light sketch vs dark wallpapers):
     readonly property bool isLightWall: {
@@ -60,10 +62,11 @@ Singleton {
     readonly property color hudGrid: isLightWall ? "#B8B8C0" : Theme.s3
     readonly property color hudDim: isLightWall ? "#252530" : Theme.mute
 
-    readonly property string dot: "FOT-Matisse Pro"        // Evangelion Matisse Pro title & number font
-    readonly property string eva: "FOT-Matisse Pro"        // Evangelion Matisse font alias
-    readonly property string ui: "Space Grotesk"
-    readonly property string mono: "Space Mono"            // Uppercase technical labels and code
+    readonly property string dot: "Noto Serif CJK JP Black"   // Evangelion Matisse / Mincho title & number font
+    readonly property string eva: "Noto Serif CJK JP Black"   // Evangelion Mincho font alias
+    readonly property string evaBlack: "Noto Serif CJK JP Black"
+    readonly property string ui: "Noto Sans CJK JP"
+    readonly property string mono: "JetBrainsMono Nerd Font" // Uppercase technical labels and code
     readonly property string nf: "JetBrainsMono Nerd Font" // System and UI icons
 
     // Canvas layout coordinate scale from 1920x1080 design baseline to current screen.
@@ -93,9 +96,9 @@ Singleton {
         st.screens = all;
     }
 
-    // Ease-out-quart glide curve without overshoot — mirrors Hyprland bezier glide curve
-    readonly property var glide: [0.25, 1, 0.5, 1, 1, 1]
-    readonly property int t: 350
+    // Heavy industrial mechanical hydraulic curve (deliberate mass, powerful hydraulic dampening)
+    readonly property var glide: [0.2, 0.0, 0.05, 1.0]
+    readonly property int t: 240
 
     // Wallpapers are rendered from cached screen-resolution JPEG copies generated by picker (via ImageMagick);
     // original high-res PNG files (often 40MB+) would introduce multi-second frame stutter.
@@ -119,11 +122,11 @@ Singleton {
     function make(o) {
         const k = Object.assign({ paint: st.paint, scheme: st.scheme, at: st.paintAt, variant: st.variant, light: st.light }, o);
         if (k.paint === "scheme") return Schemes.ALL.find(p => p.id === k.scheme) ?? Schemes.ALL[0];
-        // 16 ANSI colors for NERV: Blood Crimson, Dark Red, Muted Violet, White
-        const nervAnsi = ["#121216", "#E51D24", "#FF3B43", "#D90429", "#00E5FF", "#B00010", "#9B111E", "#EAEAEB",
-                          "#26262E", "#FF5259", "#FF6B6B", "#FF3B43", "#38E1FF", "#D90429", "#BA181B", "#FFFFFF"];
-        const base = { light: k.light, c: k.light ? nervLight : nervDark, accent: k.light ? "#CC1824" : "#E51D24", red: "#E51D24",
-                       ansi: k.light ? [15, 1, 2, 3, 4, 5, 6, 8, 7, 9, 10, 11, 12, 13, 14, 0].map(i => nervAnsi[i]) : nervAnsi };
+        // 16 ANSI colors for EVA-95 CRT: Amber, Orange, Phosphor Green, Cyan, Hazard Red
+        const evaAnsi = ["#14120E", "#FF2200", "#00FF66", "#FF8800", "#00FFFF", "#FF5500", "#38E1FF", "#FFF4E0",
+                         "#2E261B", "#FF4422", "#33FF88", "#FFAA00", "#66FFFF", "#FF7733", "#88EEFF", "#FFFFFF"];
+        const base = { light: k.light, c: k.light ? evaLight : evaDark, accent: k.light ? "#D46200" : "#FFAA00", red: "#FF2200",
+                       ansi: k.light ? [15, 1, 2, 3, 4, 5, 6, 8, 7, 9, 10, 11, 12, 13, 14, 0].map(i => evaAnsi[i]) : evaAnsi };
         const src = tones[Math.min(k.at, tones.length - 1)];
         return k.paint === "wall" && src ? Schemes.dynamic(src, k.variant, base) : base;
     }
@@ -153,7 +156,7 @@ Singleton {
         ] : st.paint === "scheme" ? Schemes.GROUPS.map(g => ({ head: g, items: Schemes.ALL.filter(p => p.group === g).map(p =>
             Object.assign(it(p.name, p, st.scheme === p.id, () => { st.scheme = p.id; st.light = p.light; }), { extra: g })) })) : [];
         return [{ head: "source", items: [
-            it("nerv", make({ paint: "" }), !st.paint || st.paint === "wall" && !tones.length, set("paint", ""), amber),
+            it("eva95", make({ paint: "" }), !st.paint || st.paint === "wall" && !tones.length, set("paint", ""), amber),
             it("wallpaper", make({ paint: "wall" }), st.paint === "wall" && !!tones.length, set("paint", "wall"), tones[0]),
             it("palette", make({ paint: "scheme" }), st.paint === "scheme", set("paint", "scheme"))
         ] }].concat(own.filter(b => b.items.length), [
@@ -232,7 +235,7 @@ Singleton {
             property bool quickHover: true // Reveal Quick Settings panel when hovering right screen edge
             property bool deckHover: true  // Reveal bottom Deck dashboard when hovering bottom screen edge
             property var deck: ["clock", "weather", "perf", "net", "media", "magi"] // Ordered Deck sections (see decks)
-            property bool larp: false      // Maximalist LARP / Tactical Overdrive mode
+            property bool larp: true      // Maximalist LARP / 1995 NERV TV Show Authentic Mode
             property var bar: ["layout", "wifi", "bluetooth", "sound", "notes", "battery", "mode", "power"] // Status bar tray icons (see bars)
             property bool barTitle: true   // Window title display on status bar
             property string barAt: "top"   // Bar orientation: "top" for NERV Tactical Command Bar
@@ -277,18 +280,28 @@ Singleton {
         const c = x => `"rgb(${hex(x)})"`;
         // Window shadow: subtle white rim glow in dark mode; soft dark drop shadow in light mode
         const shadow = light ? "rgba(0000002E)" : `rgba(${hex(fg)}1A)`;
-        // NERV window active border: Blood Crimson (#E51D24) and Electric Neon Crimson (#FF3B43) 45deg gradient with continuous angle animation
-        const activeBorder = `"rgba(e51d24ee) rgba(ff3b43cc) rgba(660708ee) 45deg"`;
-        hypr(`hl.config({ general = { gaps_in = ${g ? 0 : r.gapsIn}, gaps_out = ${g ? 0 : r.gapsOut}, border_size = ${g ? 1 : 2}, allow_tearing = ${g}, `
+        // EVA-95 CRT active border: Authentic 1995 High-beam Phosphor Amber razor edge (no animated rotation)
+        const activeBorder = `"rgb(ffaa00)"`;
+        // EVA-95 Heavy Industrial Hydraulic Machinery Animation Engine:
+        // Tokyo-3 Subterranean Linear Rail & Armored Blast Door Motion:
+        // Massive momentum, deliberate hydraulic stroke, and solid mechanical brake clamping.
+        hypr(`hl.curve("evaHydraulic", { type = "bezier", points = { { 0.25, 0.1 }, { 0.05, 1.0 } } }); `
+           + `hl.curve("evaBlastDoor", { type = "bezier", points = { { 0.2, 0.0 }, { 0.0, 1.0 } } }); `
+           + `hl.animation({ leaf = "windowsIn", enabled = true, speed = 4, bezier = "evaHydraulic", style = "slide" }); `
+           + `hl.animation({ leaf = "windowsOut", enabled = true, speed = 3, bezier = "evaBlastDoor", style = "slide" }); `
+           + `hl.animation({ leaf = "windowsMove", enabled = true, speed = 4.5, bezier = "evaHydraulic" }); `
+           + `hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "evaBlastDoor", style = "slidevert" }); `
+           + `hl.layer_rule({ match = { namespace = "eva95-(launcher|quick|deck|power|cal|prefs|clip|charms|wall)" }, no_anim = true }); `
+           + `hl.config({ general = { gaps_in = ${g ? 0 : r.gapsIn}, gaps_out = ${g ? 0 : r.gapsOut}, border_size = ${g ? 1 : 2}, allow_tearing = ${g}, `
            + `col = { active_border = ${activeBorder}, inactive_border = ${c(s3)} } }, `
-           + `decoration = { rounding = 0, blur = { enabled = true, passes = 2, size = 6 }, shadow = { enabled = true, color = "rgba(e51d2433)", range = 24, render_power = 2 } }, `
-           + `animations = { enabled = true, animation = { border = { enabled = true, speed = 8, bezier = "standard" }, borderangle = { enabled = true, speed = 30, bezier = "linear", loop = true } } }, `
+           + `decoration = { rounding = 0, blur = { enabled = true, passes = 2, size = 6 }, shadow = { enabled = true, color = "rgba(ffaa0033)", range = 24, render_power = 2 } }, `
+           + `animations = { enabled = true, animation = { border = { enabled = true, speed = 8, bezier = "standard" }, borderangle = { enabled = false } } }, `
            + `group = { col = { border_active = ${c(accent)}, border_inactive = ${c(s3)}, border_locked_active = ${c(red)}, border_locked_inactive = ${c(mute)} }, `
            + `groupbar = { font_family = "${mono}", text_color = ${c(fg)}, col = { active = ${c(accent)}, inactive = ${c(s1)}, locked_active = ${c(red)}, locked_inactive = ${c(s1)} } } }, `
            + `misc = { background_color = ${c(bg)} } })`);
 
         kitty.setText("# eva95: generated by Theme.apply() — do not edit manually\n" + [
-            ["font_family", "Space Mono"], ["window_padding_width", "20 24"], ["cursor_trail", "0"],
+            ["font_family", "JetBrainsMono Nerd Font"], ["window_padding_width", "20 24"], ["cursor_trail", "0"],
             ["foreground", fg], ["background", bg], ["cursor", accent], ["cursor_text_color", bg],
             ["selection_foreground", bg], ["selection_background", accent], ["url_color", cyan],
             ["active_border_color", accent], ["inactive_border_color", s3],
@@ -299,7 +312,7 @@ Singleton {
     }
 
     function apps() {
-        const from = nervDark.concat(nervAnsi.slice(1, 7));
+        const from = evaDark.concat(evaAnsi.slice(1, 7));
         const p = pal.light ? pair(false) ?? make({ light: false }) : pal;
         const to = p.c.concat([p.red], p.ansi.slice(2, 7));
         const pairs = from.map((c, i) => [c, "#" + hex(Qt.lighter(to[i], 1))]).filter(([a, b]) => a !== b);

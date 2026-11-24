@@ -1,23 +1,22 @@
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "logo": {
-        "type": "auto",
-        "source": "~/.config/fastfetch/nerv_logo.png",
-        "width": 26,
-        "height": 13,
+        "type": "file",
+        "source": "~/.config/fastfetch/logo.txt",
+        "color": { "1": "33", "2": "31" },
         "padding": { "top": 1, "left": 2, "right": 4 }
     },
     "display": {
         "separator": " : ",
-        "color": { "keys": "31", "title": "31", "output": "97", "separator": "90" },
-        "percent": { "color": { "green": "31", "yellow": "31", "red": "91" } }
+        "color": { "keys": "33", "title": "33", "output": "97", "separator": "33" },
+        "percent": { "color": { "green": "32", "yellow": "33", "red": "31" } }
     },
     "modules": [
         "break",
-        { "type": "custom", "format": "\u001b[1;31m[ NERV CENTRAL DOGMA // MAGI SUPERCOMPUTER // EVA-95 ]\u001b[0m" },
+        { "type": "custom", "format": "\u001b[1;33m[ NERV CENTRAL DOGMA // MAGI SUPERCOMPUTER // EVA-95 ]\u001b[0m" },
         { "type": "custom", "format": "\u001b[37m\"GOD'S IN HIS HEAVEN. ALL'S RIGHT WITH THE WORLD.\"\u001b[0m" },
-        { "type": "separator", "string": "─", "outputColor": "31" },
-        { "type": "title", "color": { "user": "1;31", "at": "90", "host": "1;37" } },
+        { "type": "separator", "string": "─", "outputColor": "33" },
+        { "type": "title", "color": { "user": "1;33", "at": "90", "host": "1;37" } },
         { "type": "os", "key": "[ OS ]      " },
         { "type": "kernel", "key": "[ KERNEL ]  ", "format": "{release}" },
         { "type": "wm", "key": "[ WM ]      ", "format": "{pretty-name}" },
