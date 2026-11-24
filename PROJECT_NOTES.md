@@ -16,7 +16,12 @@
 4. [EVA-95 Central Dogma Rice (`eva95`)](#4-eva-95-central-dogma-rice-eva95)
    * [Decoupling & Isolation Architecture](#decoupling--isolation-architecture)
    * [1995 Anime Implementation Roadmap](#1995-anime-implementation-roadmap)
-5. [Git Versioning & Branch Registry](#5-git-versioning--branch-registry)
+5. [Liquid Frosted Acrylic Rice (`glass`)](#5-liquid-frosted-acrylic-rice-glass)
+   * [Material System & Exact Tokens](#material-system--exact-tokens)
+   * [Compositor Geometry & Materials](#compositor-geometry--materials)
+   * [QuickShell Architecture & Signature Specular Glow](#quickshell-architecture--signature-specular-glow)
+   * [Terminal & Shell Sync Matrix](#terminal--shell-sync-matrix)
+6. [Git Versioning & Branch Registry](#6-git-versioning--branch-registry)
 
 ---
 
@@ -123,7 +128,50 @@ The goal of `eva95` is to recreate the authentic 1995 *Neon Genesis Evangelion* 
 
 ---
 
-## 5. Git Versioning & Branch Registry
+## 5. Liquid Frosted Acrylic Rice (`glass`)
+
+### Material System & Exact Tokens
+Profile 4: `glass` introduces macOS and visionOS translucent material depth to bare-metal Wayland without desktop bloat:
+* `Glass.bg`: `rgba(13, 16, 23, 0.65)` (Smoky translucent obsidian acrylic base)
+* `Glass.card`: `rgba(255, 255, 255, 0.08)` (Elevated floating frosted card surface)
+* `Glass.specular`: `rgba(255, 255, 255, 0.22)` (Top-edge specular white light refraction hairline)
+* `Glass.cyan`: `#70C0D0` (Icy glacial glow — active focus highlight)
+* `Glass.lavender`: `#B48EAD` (Luminous soft neon purple — media & secondary tags)
+* `Glass.fg`: `#FFFFFF` (Optical white with soft drop-shadow)
+* `Glass.sub`: `rgba(255, 255, 255, 0.65)` (Semi-translucent frosted label text)
+
+### Compositor Geometry & Materials
+Configured in `Theme.apply()`:
+* **Window Rounding:** `rounding = 18px` (Continuous liquid squircle curvature).
+* **Border Styling:** `border_size = 1px`, `col.active_border = rgba(255,255,255,0.28) rgba(255,255,255,0.06) 90deg` (Simulates physical glass plate top-edge light catch).
+* **Window Opacity:** Active `0.85`, Inactive `0.75` (Content floating on frosted plate glass; Kitty terminal window rule `opacity 0.82 0.72 override` for Dual-Kawase wallpaper blur).
+* **Blur Profile:** Heavy **Dual-Kawase Blur** (`passes = 4`, `size = 7`, `noise = 0.02`, `contrast = 0.95`, `brightness = 1.05`).
+* **Fluid Spring Animation Engine:**
+  * Custom Bezier curves: `macosSpring = 0.16, 1, 0.3, 1`, `fluid = 0.05, 0.9, 0.1, 1.05`, `appleEase = 0.25, 1, 0.5, 1`.
+  * Fluid window movement (`windowsMove` with `fluid`), elastic popin (`windowsIn` with `fluid`), smooth slidefade workspace transitions (`workspaces` with `appleEase` and `slidefade 20%`), and border focus cross-fades.
+* **Layer Rules & Compositor Safeguards:**
+  * `hl.layer_rule({ match = { namespace = "glass-(launcher|quick|deck|notifs|bar|dock|osd|battery)" }, no_anim = true })` prevents Hyprland whole-screen slide animations on panel mapping.
+  * Never apply `blur = true` to wildcard layer namespaces (`glass-.*`): Hyprland blurs the entire bounding rectangle of full-width or fullscreen transparent layer surfaces, creating intrusive blurred bands. Blur must only be handled inside QML or on tightly-bound opaque panels.
+  * Floating HUDs (like `Osd.qml`) must bind `visible: root.shown` so that idle surfaces are completely unmapped from Wayland.
+
+### QuickShell Architecture & Signature Specular Glow
+* **Floating Top Menu Bar (`bar/Bar.qml`):** Detached by 8px from tiled windows, frosted glass blur with Apple logo dropdown menu, interactive menu buttons (*File*, *Edit*, *View*, *Window*, *Help*), shifted active window title, prominent glowing charging bolt beside battery capsule bar, and right status tray (Battery, Wi-Fi, Bluetooth, Spotlight, Control Center, Clock).
+* **Dedicated Battery Panel (`battery/Battery.qml`):** macOS-style battery menu with live percentage, charging status and time-to-full/empty, continuous level gauge, power draw (wattage), battery health condition, top CPU energy consumers, and Battery Preferences link.
+* **The Dynamic Dock (`dock/Dock.qml`):** Centered floating translucent frosted glass shelf. Dynamically replicates running windows in the exact order of their workspaces, with parabolic hover magnification, active workspace indicator dots, window title / workspace tooltip pills, and triple-layer failsafe auto-hide.
+* **Spotlight Search (`launcher/Launcher.qml`):** Floating search pane on `Super + Space` featuring 4 mode switcher tabs (*Apps*, *Commands*, *Windows*, *Calculator*), direct shell command execution (`> cmd`), live math evaluation (`qalc`), window switcher, and fluid animated trailing cursor caret.
+* **Control Center (`quick/Quick.qml`):** Modular acrylic tiles with prominent Wi-Fi & Bluetooth primary capsules, expand pickers (`Picker.qml`), Focus (DND), Caffeine, Night Light, continuous volume/brightness sliders, and Now Playing media card.
+* **Dashboard Deck (`deck/Deck.qml`):** 100% continuous liquid frosted acrylic dashboard with continuous circular arc gauges (`Canvas`) for CPU/RAM/GPU, sleek horizontal process bars, vertical core bars, crisp weather forecast cards, and real-time network throughput sparkline.
+* **Signature Interactive Feature:** Dynamic Specular Cursor Glow (`components/SpecularGlow.qml`) projects a soft radial specular highlight beneath the pointer across cards, tiles, and dock shelves.
+
+### Terminal & Shell Sync Matrix
+* **Starship:** Smooth connected rounded bubble prompt (`╭─(  )─( ~/daedalus )─(  main )`).
+* **Fastfetch:** Apple/Linux fusion vector logo with glacial cyan accents.
+* **Kitty:** `background_opacity 0.80`, `dynamic_background_opacity yes`, `cursor_trail 4`, Dual-Kawase blur, Tokyo Night / Catppuccin pastel syntax palette.
+* **Btop / Papirus:** `glass.theme` color palette and `folder-cyan` icon overlays.
+
+---
+
+## 6. Git Versioning & Branch Registry
 * **`v1.0-nerv-baseline`**: Git tag marking the stable baseline of the NERV tactical rice at commit `84b77ae`.
 * **`nerv-tactical-v1`**: Dedicated stable branch tracking the baseline at commit `84b77ae` (pushed to origin).
 * **`main`**: Active development branch containing the maximalist `nerv` rice (commit `f500cfd`) and the newly initialized `eva95` rice (commit `d47d83a`).

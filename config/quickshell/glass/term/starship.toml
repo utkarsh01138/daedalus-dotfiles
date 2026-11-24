@@ -1,0 +1,42 @@
+# glass: Smooth connected rounded bubble prompt — (  )─( ~/daedalus )─(  main )
+add_newline = false
+
+format = '''
+[╭─\(](bold #70C0D0) $os [\)─\(](bold #70C0D0) $directory [\)─\(](bold #70C0D0) $git_branch$git_status [\)](bold #70C0D0)$fill$cmd_duration
+[╰─](bold #70C0D0)$character '''
+
+[os]
+disabled = false
+style = "bold #FFFFFF"
+symbols = { Arch = "", Linux = "󰌽", Macos = "" }
+format = "[$symbol]($style)"
+
+[directory]
+style = "bold #70C0D0"
+truncation_length = 4
+truncation_symbol = "…/"
+read_only = " 󰌾"
+read_only_style = "bold #FF5C5C"
+format = "[$path]($style)[$read_only]($read_only_style)"
+
+[git_branch]
+symbol = " "
+style = "bold #B48EAD"
+format = "[$symbol$branch]($style)"
+
+[git_status]
+style = "bold #EBCB8B"
+format = "([$all_status$ahead_behind]($style))"
+
+[cmd_duration]
+min_time = 2000
+style = "bold #A3B1CC"
+format = "[$duration]($style) "
+
+[fill]
+symbol = " "
+
+[character]
+success_symbol = "[›](bold #70C0D0) "
+error_symbol = "[›](bold #FF5C5C) "
+vimcmd_symbol = "[‹](bold #B48EAD) "
