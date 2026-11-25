@@ -56,11 +56,6 @@ PanelWindow {
     property real t: open ? 1 : 0
     Behavior on t { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
 
-    // Click masking: background scrim intercepts clicks when open, 100% pass-through when closed
-    mask: Region {
-        item: root.open ? scrim : null
-    }
-
     function icon(name) {
         return Quickshell.iconPath(name || "application-x-executable", "application-x-executable");
     }

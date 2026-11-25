@@ -44,10 +44,6 @@ PanelWindow {
     property real t: open ? 1 : 0
     Behavior on t { NumberAnimation { duration: Theme.t; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.glide } }
 
-    mask: Region {
-        item: root.open ? scrim : null
-    }
-
     function getAppIcon(cls) {
         return Quickshell.iconPath((cls || "application-x-executable").toLowerCase(), "application-x-executable");
     }
