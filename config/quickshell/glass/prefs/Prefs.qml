@@ -25,10 +25,10 @@ PanelWindow {
 
     property int sel: 0
     signal wallRequested // Wallpaper picker opens full-screen overlay (wall/Walls), managed via shell.qml
-    readonly property var sections: ["HOME", "DECK", "BAR", "LOOK", "STYLE", "WINDOWS", "DISPLAY", "AUDIO", "POWER", "INPUT", "IDLE", "SHELL"]
+    readonly property var sections: ["HOME", "DECK", "BAR", "LOOK", "STYLE", "WINDOWS", "DISPLAY", "AUDIO", "POWER", "INPUT", "IDLE", "SHELL", "CORNERS"]
     readonly property string moves: "shift ←→ move · ↵ swap · del drop · drag"
     readonly property string rings: "drag round the rings · scroll"
-    readonly property var hints: [moves, moves, moves, "", "hover to preview · ↵ or click sets it", rings, "drag a screen to move it · " + rings, "click or ←→ a device", "↵ or click a mode", rings, "drag the marks", ""]
+    readonly property var hints: [moves, moves, moves, "", "hover to preview · ↵ or click sets it", rings, "drag a screen to move it · " + rings, "click or ←→ a device", "↵ or click a mode", rings, "drag the marks", "", "click a corner to cycle action"]
     readonly property var r: Rules.store
 
     // Glyph icon mappings for home widgets, deck sections, and bar tray items
@@ -1286,6 +1286,175 @@ PanelWindow {
                 Act { icon: "\u{F0450}"; text: "reload"; onHit: Quickshell.reload(false) }
                 Toggle { text: "do not disturb"; on: Theme.state.dnd; onFlip: Theme.state.dnd = !Theme.state.dnd }
             }
+        }
+
+        // ---- CORNERS: macOS Hot Corners Manager ----
+        Page {
+            k: 12
+            caption: "hot corners · desktop automation"
+
+            readonly property var actionLabels: ({
+                none: "— (Disabled)",
+                quicknote: "Quick Note",
+                missioncontrol: "Mission Control",
+                quick: "Control Center",
+                launcher: "Spotlight Search",
+                deck: "Dashboard / Deck",
+                lock: "Lock Screen",
+                shot: "Take Screenshot"
+            })
+            readonly property var actionKeys: ["none", "quicknote", "missioncontrol", "quick", "launcher", "deck", "lock", "shot"]
+
+            function cycle(pos) {
+                const hc = Object.assign({}, Theme.state.hotCorners || {});
+                const cur = hc[pos] || "none";
+                const nextIdx = (actionKeys.indexOf(cur) + 1) % actionKeys.length;
+                hc[pos] = actionKeys[nextIdx];
+                Theme.state.hotCorners = hc;
+            }
+
+            Item {
+                width: 760
+                height: 380
+
+                // Central Monitor Mockup
+                Rectangle {
+                    id: monScreen
+                    anchors.centerIn: parent
+                    width: 440
+                    height: 270
+                    radius: 18
+                    color: Theme.s2
+                    border.width: 1.5
+                    border.color: Theme.s3
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        radius: 14
+                        color: Qt.rgba(13 / 255, 16 / 255, 23 / 255, 0.85)
+                    }
+
+                    Rectangle {
+                        anchors { top: parent.top; left: parent.left; right: parent.right; margins: 8 }
+                        height: 12
+                        radius: 6
+                        color: Qt.rgba(255, 255, 255, 0.12)
+                    }
+
+                    Rectangle {
+                        anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: 8 }
+                        width: 130
+                        height: 12
+                        radius: 6
+                        color: Qt.rgba(255, 255, 255, 0.12)
+                    }
+
+                    // 4 glowing corner indicators
+                    Rectangle {
+                        anchors { top: parent.top; left: parent.left; margins: 4 }
+                        width: 28; height: 28; radius: 14
+                        color: Theme.cyan; opacity: hovTL.containsMouse ? 0.8 : 0.2
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+                    Rectangle {
+                        anchors { top: parent.top; right: parent.right; margins: 4 }
+                        width: 28; height: 28; radius: 14
+                        color: Theme.cyan; opacity: hovTR.containsMouse ? 0.8 : 0.2
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+                    Rectangle {
+                        anchors { bottom: parent.bottom; left: parent.left; margins: 4 }
+                        width: 28; height: 28; radius: 14
+                        color: Theme.cyan; opacity: hovBL.containsMouse ? 0.8 : 0.2
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+                    Rectangle {
+                        anchors { bottom: parent.bottom; right: parent.right; margins: 4 }
+                        width: 28; height: 28; radius: 14
+                        color: Theme.cyan; opacity: hovBR.containsMouse ? 0.8 : 0.2
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+                }
+
+                // Top-Left Pill
+                Rectangle {
+                    id: btnTL
+                    anchors { right: monScreen.left; top: monScreen.top; rightMargin: 14 }
+                    width: 180; height: 38; radius: 19
+                    color: hovTL.containsMouse ? Theme.s1 : Theme.s2
+                    border.width: 1; border.color: hovTL.containsMouse ? Theme.cyan : Theme.s3
+
+                    Row {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "\u{F053}"; font.family: Theme.nf; font.pixelSize: 10; color: Theme.cyan; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: parent.parent.parent.parent.actionLabels[Theme.state.hotCorners?.topLeft ?? "none"]; font.family: Theme.ui; font.pixelSize: 11; font.weight: Font.DemiBold; color: Theme.fg; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                    MouseArea {
+                        id: hovTL; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: parent.parent.parent.cycle("topLeft")
+                    }
+                }
+
+                // Top-Right Pill
+                Rectangle {
+                    id: btnTR
+                    anchors { left: monScreen.right; top: monScreen.top; leftMargin: 14 }
+                    width: 180; height: 38; radius: 19
+                    color: hovTR.containsMouse ? Theme.s1 : Theme.s2
+                    border.width: 1; border.color: hovTR.containsMouse ? Theme.cyan : Theme.s3
+
+                    Row {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: parent.parent.parent.parent.actionLabels[Theme.state.hotCorners?.topRight ?? "quick"]; font.family: Theme.ui; font.pixelSize: 11; font.weight: Font.DemiBold; color: Theme.fg; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: "\u{F054}"; font.family: Theme.nf; font.pixelSize: 10; color: Theme.cyan; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                    MouseArea {
+                        id: hovTR; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: parent.parent.parent.cycle("topRight")
+                    }
+                }
+
+                // Bottom-Left Pill
+                Rectangle {
+                    id: btnBL
+                    anchors { right: monScreen.left; bottom: monScreen.bottom; rightMargin: 14 }
+                    width: 180; height: 38; radius: 19
+                    color: hovBL.containsMouse ? Theme.s1 : Theme.s2
+                    border.width: 1; border.color: hovBL.containsMouse ? Theme.cyan : Theme.s3
+
+                    Row {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "\u{F053}"; font.family: Theme.nf; font.pixelSize: 10; color: Theme.cyan; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: parent.parent.parent.parent.actionLabels[Theme.state.hotCorners?.bottomLeft ?? "missioncontrol"]; font.family: Theme.ui; font.pixelSize: 11; font.weight: Font.DemiBold; color: Theme.fg; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                    MouseArea {
+                        id: hovBL; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: parent.parent.parent.cycle("bottomLeft")
+                    }
+                }
+
+                // Bottom-Right Pill
+                Rectangle {
+                    id: btnBR
+                    anchors { left: monScreen.right; bottom: monScreen.bottom; leftMargin: 14 }
+                    width: 180; height: 38; radius: 19
+                    color: hovBR.containsMouse ? Theme.s1 : Theme.s2
+                    border.width: 1; border.color: hovBR.containsMouse ? Theme.cyan : Theme.s3
+
+                    Row {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: parent.parent.parent.parent.actionLabels[Theme.state.hotCorners?.bottomRight ?? "quicknote"]; font.family: Theme.ui; font.pixelSize: 11; font.weight: Font.DemiBold; color: Theme.fg; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: "\u{F054}"; font.family: Theme.nf; font.pixelSize: 10; color: Theme.cyan; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                    MouseArea {
+                        id: hovBR; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: parent.parent.parent.cycle("bottomRight")
+                    }
+                }
+            }
+
+            Lb { text: "click any corner pill to cycle actions · dwell in that screen corner for 200ms to trigger" }
         }
     }
 

@@ -142,20 +142,21 @@ PanelWindow {
             }];
         }
 
-        // Calculator Mode
-        if (root.mode === 3 || (root.calcResult && raw.length >= 2 && /[0-9+\-*\/^%().=]/.test(raw))) {
-            const items = [];
-            if (root.calcResult) {
-                items.push({
-                    id: "calc-res",
-                    name: root.calcResult,
-                    generic: "Calculation Result",
-                    desc: "Press Enter to copy to clipboard",
-                    src: root.icon("accessories-calculator"),
-                    kind: "calc",
-                    run: () => Quickshell.execDetached(["wl-copy", root.calcResult])
-                });
-            }
+        // Calculator items if math or unit conversion is detected
+        const items = [];
+        if (root.calcResult) {
+            items.push({
+                id: "calc-res",
+                name: `= ${root.calcResult}`,
+                generic: "Calculation Result",
+                desc: `${raw} = ${root.calcResult} · Press Enter to copy to clipboard`,
+                src: root.icon("accessories-calculator"),
+                kind: "calc",
+                run: () => {
+                    Quickshell.execDetached(["wl-copy", root.calcResult]);
+                    root.close();
+                }
+            });
             if (root.mode === 3) return items;
         }
 
@@ -164,8 +165,9 @@ PanelWindow {
             return filter(winItems, q);
         }
 
-        // Standard Apps Mode
+        // Standard Apps Mode (combine with calculation result if present)
         const appRes = filter(apps, q);
+        if (items.length > 0) return items.concat(appRes);
         if (appRes.length > 0) return appRes;
 
         // Fallback Web Search if no apps match
@@ -183,7 +185,7 @@ PanelWindow {
         return [];
     }
 
-    // Quick calculation via qalc
+    // Quick calculation via qalc & instant JavaScript arithmetic engine
     Process {
         id: calcProc
         command: ["qalc", "-t", root.query.trim()]
@@ -192,8 +194,6 @@ PanelWindow {
                 const res = text.trim();
                 if (res && !res.toLowerCase().includes("error") && res !== root.query.trim()) {
                     root.calcResult = res;
-                } else {
-                    root.calcResult = "";
                 }
             }
         }
@@ -202,11 +202,26 @@ PanelWindow {
     onQueryChanged: {
         sel = 0;
         const q = query.trim();
-        if (q.length >= 2 && /[0-9+\-*\/^%().=]/.test(q)) {
+        let fastFound = false;
+
+        // Instant 0ms arithmetic evaluator
+        if (/^[0-9+\-*\/^%().\s]+$/.test(q) && /[+\-*\/^%]/.test(q)) {
+            try {
+                const clean = q.replace(/\^/g, "**");
+                const r = Function('"use strict"; return (' + clean + ')')();
+                if (typeof r === "number" && !isNaN(r) && isFinite(r)) {
+                    root.calcResult = Number.isInteger(r) ? r.toString() : r.toFixed(4).replace(/\.?0+$/, "");
+                    fastFound = true;
+                }
+            } catch (e) {}
+        }
+
+        // Asynchronous qalc for units, currencies, and complex conversions
+        if (q.length >= 2 && (/[0-9+\-*\/^%().=]/.test(q) || /^(sin|cos|tan|sqrt|pi|abs|log|ln)\b/i.test(q) || /\b(to|in)\b/i.test(q))) {
             calcProc.command = ["qalc", "-t", q.replace(/^[=>\s]+/, "")];
             calcProc.running = true;
-        } else {
-            calcResult = "";
+        } else if (!fastFound) {
+            root.calcResult = "";
         }
     }
 
@@ -620,21 +635,21 @@ PanelWindow {
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: rightPane.cur?.name || ""
+                            text: rightPane.cur?.kind === "calc" ? root.calcResult : (rightPane.cur?.name || "")
                             font.family: Theme.title
-                            font.pixelSize: 18
+                            font.pixelSize: rightPane.cur?.kind === "calc" ? 26 : 18
                             font.weight: Font.Bold
-                            color: Theme.fg
+                            color: rightPane.cur?.kind === "calc" ? Theme.cyan : Theme.fg
                             elide: Text.ElideRight
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: rightPane.cur?.generic || (rightPane.cur?.kind === "cmd" ? "Command" : "Application")
+                            text: rightPane.cur?.kind === "calc" ? `Formula: ${root.query.trim()}` : (rightPane.cur?.generic || (rightPane.cur?.kind === "cmd" ? "Command" : "Application"))
                             font.family: Theme.ui
                             font.pixelSize: 12
                             font.weight: Font.Medium
-                            color: Theme.cyan
+                            color: rightPane.cur?.kind === "calc" ? Theme.fg : Theme.cyan
                         }
                     }
 

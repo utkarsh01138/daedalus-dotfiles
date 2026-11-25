@@ -9,7 +9,6 @@ import "cal"
 import "charms"
 import "clip"
 import "deck"
-import "dock"
 import "glyph"
 import "home"
 import "launcher"
@@ -23,6 +22,10 @@ import "vpn"
 import "wall"
 import "binds"
 import "battery"
+import "anemoi"
+import "corner"
+import "quicknote"
+import "mission"
 
 // Profile 4: glass — Liquid Frosted Acrylic (The Creative Studio).
 // Brings high-end macOS and visionOS material depth to bare-metal Wayland.
@@ -41,7 +44,9 @@ ShellRoot {
     Clip { id: clip }
     Charms { id: charms }
     Deck { id: deck }
-    Osd { id: osd }
+    DynamicIsland { id: island }
+    QuickNote { id: quickNote }
+    MissionControl { id: missionControl }
     Shot { id: shot }
     Vpn { id: vpn }
     Walls { id: walls }
@@ -56,6 +61,8 @@ ShellRoot {
             Back { screen: s.modelData }
             Home { screen: s.modelData; visible: Theme.scr(s.modelData.name, "home") }
             Hot { screen: s.modelData; onTriggered: quick.peek() }
+            HotCorners { screen: s.modelData; onTriggered: act => shell.handleAction(act) }
+            AnemoiOverlay { screen: s.modelData }
 
             Bar {
                 screen: s.modelData
@@ -75,13 +82,6 @@ ShellRoot {
                 onCharmsClicked: charms.toggle()
                 onBindsClicked: binds.toggle()
                 onWallsClicked: walls.toggle()
-            }
-
-            Dock {
-                screen: s.modelData
-                onLauncherRequested: launcher.toggle()
-                onQuickRequested: quick.toggle()
-                onSettingsRequested: prefs.open()
             }
         }
     }
@@ -174,6 +174,21 @@ ShellRoot {
     Shortcut { name: "wall"; description: "Wallpaper picker"; onPressed: walls.toggle() }
     Shortcut { name: "binds"; description: "Keybindings helper panel"; onPressed: binds.toggle() }
     Shortcut { name: "game"; description: "Toggle game mode"; onPressed: Rules.store.game = !Rules.store.game }
+    Shortcut { name: "mission"; description: "Mission Control overview"; onPressed: missionControl.toggle() }
+    Shortcut { name: "missionControl"; description: "Mission Control overview"; onPressed: missionControl.toggle() }
+    Shortcut { name: "quickNote"; description: "Quick Note"; onPressed: quickNote.toggle() }
+    Shortcut { name: "note"; description: "Quick Note"; onPressed: quickNote.toggle() }
+
+    function handleAction(act) {
+        if (!act || act === "none") return;
+        if (act === "quicknote") quickNote.toggle();
+        else if (act === "missioncontrol") missionControl.toggle();
+        else if (act === "quick") quick.toggle();
+        else if (act === "launcher") launcher.toggle();
+        else if (act === "deck") deck.toggle();
+        else if (act === "lock") Quickshell.execDetached(["rice", "lock"]);
+        else if (act === "shot") shot.open();
+    }
 
     component Shortcut: GlobalShortcut { appid: "shell" }
 }

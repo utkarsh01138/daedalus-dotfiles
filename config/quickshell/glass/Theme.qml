@@ -155,6 +155,15 @@ Singleton {
             property int recQuality: 2
             property bool recCursor: true
             property bool vpnPortal: false
+            property bool anemoi: false
+            property string anemoiMode: "auto"
+            property int anemoiSeasonIndex: 0
+            property bool anemoiManualTime: false
+            property real anemoiTimeHour: 12.0
+            property int anemoiDensity: 100
+            property int anemoiSpeed: 100
+            property bool anemoiInteractive: false
+            property var hotCorners: ({ topLeft: "none", topRight: "quick", bottomLeft: "missioncontrol", bottomRight: "quicknote" })
         }
     }
 
@@ -189,7 +198,7 @@ Singleton {
            + `hl.animation({ leaf = "border", enabled = true, speed = 5, bezier = "appleEase" }); `
            + `hl.window_rule({ match = { class = "kitty" }, opacity = "0.82 0.72 override" }); `
            + `hl.window_rule({ match = { class = "agy-term" }, opacity = "0.85 0.75 override" }); `
-           + `hl.layer_rule({ match = { namespace = "glass-(launcher|quick|deck|notifs|bar|dock|osd|battery)" }, no_anim = true }); `
+           + `hl.layer_rule({ match = { namespace = "glass-(launcher|quick|deck|notifs|bar|dock|osd|battery|island|note|mission|corners)" }, no_anim = true }); `
            + `hl.config({ general = { gaps_in = ${g ? 0 : 8}, gaps_out = ${g ? 0 : 10}, border_size = 1, allow_tearing = ${g}, `
            + `col = { active_border = ${activeBorder}, inactive_border = ${inactiveBorder} } }, `
            + `decoration = { rounding = ${g ? 0 : 18}, active_opacity = 0.85, inactive_opacity = 0.75, `

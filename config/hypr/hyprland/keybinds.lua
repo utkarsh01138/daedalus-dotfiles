@@ -47,6 +47,10 @@ hl.bind("SUPER + question", hl.dsp.global("shell:binds"))
 -- Screenshots (New Rice Screenshot tool on Print)
 hl.bind("Print", hl.dsp.global("shell:shot"))
 
+-- Mission Control & Quick Note (macOS Liquid Frosted Acrylic Profile)
+hl.bind("SUPER + Tab", hl.dsp.global("shell:mission"))             -- SUPER + Tab -> Mission Control overview
+hl.bind("SUPER + ALT + N", hl.dsp.global("shell:quickNote"))       -- SUPER + ALT + N -> macOS Quick Note (Obsidian)
+
 -- Apps
 hl.bind(vars.kbTerminal, hl.dsp.exec_cmd(vars.terminal))             -- SUPER + T -> kitty
 hl.bind(vars.kbFileExplorer, hl.dsp.exec_cmd(vars.fileExplorer))     -- SUPER + E -> thunar (new rice file manager)
